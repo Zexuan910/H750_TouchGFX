@@ -1,0 +1,282 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Name": "screen1",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "touchBox",
+            "X": 30,
+            "Y": 25,
+            "Width": 180,
+            "Height": 60,
+            "Color": {
+              "Red": 64,
+              "Green": 64,
+              "Blue": 64
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "touchText",
+            "X": 30,
+            "Y": 42,
+            "Width": 180,
+            "Height": 30,
+            "TextId": "T_CN_2",
+            "TextRotation": "0"
+          },
+          {
+            "Type": "Box",
+            "Name": "displayBox",
+            "X": 30,
+            "Y": 115,
+            "Width": 180,
+            "Height": 130,
+            "Color": {
+              "Red": 32,
+              "Green": 32,
+              "Blue": 32
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "displayText",
+            "X": 30,
+            "Y": 165,
+            "Width": 180,
+            "Height": 40,
+            "TextId": "__SingleUse_06WV",
+            "TextRotation": "0"
+          },
+          {
+            "Type": "Button",
+            "Name": "nextButton",
+            "X": 70,
+            "Y": 245,
+            "Width": 100,
+            "Height": 36,
+            "Pressed": "__generated\\alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_pressed.png",
+            "Released": "__generated\\alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_action.png",
+            "Preset": "alternate_theme\\presets\\button\\regular\\height_36\\tiny_rounded_action.json"
+          },
+          {
+            "Type": "Image",
+            "Name": "displayImage",
+            "X": 30,
+            "Y": 142,
+            "Width": 180,
+            "Height": 75,
+            "RelativeFilename": "b.png"
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "nextButton"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "Screen2"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "Screen2",
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "rectBox1",
+            "X": 30,
+            "Y": 35,
+            "Width": 180,
+            "Height": 75,
+            "Color": {
+              "Red": 255,
+              "Green": 80,
+              "Blue": 80
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "rectBox2",
+            "X": 30,
+            "Y": 150,
+            "Width": 180,
+            "Height": 75,
+            "Color": {
+              "Red": 80,
+              "Green": 255,
+              "Blue": 80
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "rectText1",
+            "X": 30,
+            "Y": 60,
+            "Width": 180,
+            "Height": 30,
+            "TextId": "__SingleUse_S7VM",
+            "TextRotation": "0"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "rectText2",
+            "X": 30,
+            "Y": 175,
+            "Width": 180,
+            "Height": 30,
+            "TextId": "__SingleUse_YBPW",
+            "TextRotation": "0"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "pageText",
+            "Y": 250,
+            "Width": 240,
+            "Height": 25,
+            "TextId": "__SingleUse_GH4U",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 3,
+              "Green": 2,
+              "Blue": 2
+            }
+          },
+          {
+            "Type": "Image",
+            "Name": "image1",
+            "X": -487,
+            "Y": -357,
+            "Width": 180,
+            "Height": 75,
+            "RelativeFilename": "b.png"
+          },
+          {
+            "Type": "Image",
+            "Name": "image2",
+            "X": 30,
+            "Y": 115,
+            "Width": 180,
+            "Height": 75,
+            "RelativeFilename": "a.png"
+          }
+        ],
+        "Interactions": []
+      },
+      {
+        "Name": "Screen3",
+        "CanvasBufferSize": 3600,
+        "Components": [
+          {
+            "Type": "Box",
+            "Name": "backgroundBox",
+            "Width": 240,
+            "Height": 280,
+            "Color": {
+              "Green": 16,
+              "Blue": 32
+            }
+          },
+          {
+            "Type": "Circle",
+            "Name": "circle1",
+            "X": 70,
+            "Y": 70,
+            "Width": 100,
+            "Height": 100,
+            "Color": {
+              "Green": 170,
+              "Blue": 255
+            },
+            "CenterX": 40.0,
+            "CenterY": 40.0,
+            "Radius": 40.0,
+            "EndAngle": 360.0,
+            "CapPrecision": "Butt"
+          },
+          {
+            "Type": "TextArea",
+            "Name": "circleText",
+            "Y": 190,
+            "Width": 240,
+            "Height": 30,
+            "TextId": "__SingleUse_IOQU",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 255,
+              "Green": 255,
+              "Blue": 255
+            }
+          },
+          {
+            "Type": "Image",
+            "Name": "image1",
+            "Width": 80,
+            "Height": 80
+          }
+        ],
+        "Interactions": []
+      }
+    ],
+    "CustomContainerDefinitions": [],
+    "Name": "H750_TouchGFX",
+    "Resolution": {
+      "Width": 240,
+      "Height": 280
+    },
+    "SelectedColorDepth": 16,
+    "StartupScreenName": "screen1",
+    "SelectedStartupLanguage": "GB",
+    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "UIPath": ".",
+    "AvailableColorDepths": [
+      16
+    ],
+    "AvailableLCDs": {
+      "16": "LCD16bpp"
+    },
+    "AvailableSections": [
+      "ExtFlashSection",
+      "IntFlashSection"
+    ],
+    "AvailableResolutions": [
+      {
+        "Width": 240,
+        "Height": 280
+      }
+    ],
+    "PhysicalButtons": [],
+    "FrameworkFeatures": {
+      "LCD16bpp": {
+        "Id": "LCD16bpp",
+        "IsEnabled": false
+      }
+    },
+    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "PostGenerateTargetCommand": "touchgfx update_project",
+    "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
+    "RunSimulatorCommand": "build\\bin\\simulator.exe",
+    "LandscapeSkinX": 0,
+    "LandscapeSkinY": 0,
+    "PortraitSkinX": 0,
+    "PortraitSkinY": 0,
+    "DisplayOrientation": "Portrait",
+    "Family": "STM32H7",
+    "SubFamily": "STM32H750 Value line",
+    "Toolchain": "CMake",
+    "Platform": "m7",
+    "ProjectFile": "../H750_TouchGFX.ioc",
+    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponents": [],
+    "AdditionalFeatures": []
+  },
+  "Version": "4.26.1"
+}

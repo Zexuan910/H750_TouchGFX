@@ -1,0 +1,61 @@
+本工程是在你上传的 H750_TouchGFX 基础上修改的，显示屏底层设置按 SCREEN_COLOR(2) 对齐。
+
+一、已对齐 SCREEN_COLOR 的显示硬件设置
+1. 屏幕接口继续使用 SPI1：
+   PB5  -> LCD_SDA / SPI1_MOSI
+   PG11 -> LCD_SCK / SPI1_SCK
+   PG9  -> SPI1_MISO
+   PJ6  -> LCD_CS
+   PJ7  -> LCD_RST
+   PJ8  -> LCD_DC
+   PA8  -> LCD_BL / TIM1_CH1 PWM
+
+2. LCD 尺寸与偏移：
+   LCD_PORT_WIDTH  = 240
+   LCD_PORT_HEIGHT = 280
+   LCD_PORT_Y_OFFSET = 20
+   这和 SCREEN_COLOR 的 1.69 寸屏幕设置一致。
+
+3. LCD 初始化序列：
+   Core/Src/lcd_port.c 里的 lcd_write_init_sequence 已按 SCREEN_COLOR/Core/Src/LCD_1in69.c 补齐，包括 0xE0、0xE1、0xE4 等伽马/显示参数。
+
+4. SPI 时钟源：
+   Core/Src/spi.c 中 SPI1 外设时钟改为 RCC_SPI123CLKSOURCE_PLL，按 SCREEN_COLOR 对齐。
+
+5. SystemClock_Config：
+   Core/Src/main.c 中 PLL/APB2 分频按 SCREEN_COLOR 的配置补齐。
+
+二、已补充 TouchGFX 页面逻辑
+1. TouchGFX 改为 Portrait 方向，画布按 240x280 使用。
+2. Screen1：点击上方矩形，切换下方显示区域：
+   红 / 绿 / 蓝
+   hello word / hello buaa / hello ubaa
+   中文字符
+   图片 A / 图片 B
+
+3. Screen2：上下滑动切换 5 页：
+   第1页：矩形1、矩形2
+   第2页：矩形3、矩形4
+   第3页：矩形5、矩形6
+   第4页：矩形7、矩形8
+   第5页：矩形9、矩形10
+
+4. Screen2 左滑进入 Screen3。
+5. Screen3 右滑返回 Screen2。
+6. 补上了 generated/common/FrontendApplicationBase 里的 Screen3 跳转函数。
+7. 删除了 cmake/touchgfx/CMakeLists.txt 里无效的 screen_screen/screenView.cpp 源文件，否则会找不到 screenView.hpp。
+
+三、当前需要注意
+1. SCREEN_COLOR 本身是显示点亮工程，没有 CST816T/I2C 触摸驱动。
+2. 所以本修改包已经写好了 TouchGFX 的点击/滑动处理逻辑，但真机要能触摸，还需要后续补 STM32TouchController.cpp 的实际触摸采样函数。
+3. 在 TouchGFX Designer 里如果重新 Generate Code，generated/gui_generated 会被重新覆盖；我已经同步修改了 H750_TouchGFX.touchgfx，正常情况下控件名和布局会保留，但仍建议重新生成后检查：
+   touchBox / touchText / displayBox / displayText / displayImage / nextButton
+   rectBox1 / rectText1 / rectBox2 / rectText2 / pageText
+   backgroundBox / circle1 / circleText
+
+四、推荐验证顺序
+1. 先不重新打开 CubeMX，直接用 VSCode/CMake 编译。
+2. 烧录后先看屏幕是否能正常显示 Screen1。
+3. 如果屏幕方向或位置不对，优先检查 TouchGFX 是否还是 Portrait，以及 lcd_port.h 的 WIDTH/HEIGHT/OFFSET。
+4. 如果颜色不对，再试 0x3A 的 0x05 / 0x55，两者都是 RGB565 相关配置，不同 ST7789 模块可能表现不同。
+5. 如果真机触摸无反应，是因为还没接入 CST816T 驱动，不是 TouchGFX 页面逻辑问题。
