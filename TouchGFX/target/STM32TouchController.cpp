@@ -7,41 +7,33 @@
   */
 /* USER CODE END Header */
 
-#include <STM32TouchController.hpp>
+/* USER CODE BEGIN STM32TouchController */
 
-#if ENABLE_CST816T_TOUCH
-extern "C"
-{
-#include "cst816t.h"
-}
-#endif
+#include <STM32TouchController.hpp>
 
 void STM32TouchController::init()
 {
-#if ENABLE_CST816T_TOUCH
-    CST816T_Init();
-#endif
+    /**
+     * Initialize touch controller and driver
+     *
+     */
 }
 
 bool STM32TouchController::sampleTouch(int32_t& x, int32_t& y)
 {
-#if ENABLE_CST816T_TOUCH
-    uint16_t tx = 0;
-    uint16_t ty = 0;
-
-    if (CST816T_ReadTouch(&tx, &ty))
-    {
-        x = static_cast<int32_t>(tx);
-        y = static_cast<int32_t>(ty);
-        return true;
-    }
-
+    /**
+     * By default sampleTouch returns false,
+     * return true if a touch has been detected, otherwise false.
+     *
+     * Coordinates are passed to the caller by reference by x and y.
+     *
+     * This function is called by the TouchGFX framework.
+     * By default sampleTouch is called every tick, this can be adjusted by HAL::setTouchSampleRate(int8_t);
+     *
+     */
     return false;
-#else
-    (void)x;
-    (void)y;
-    return false;
-#endif
 }
+
+/* USER CODE END STM32TouchController */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

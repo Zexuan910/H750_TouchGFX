@@ -1,20 +1,25 @@
 {
-    // 使用 IntelliSense 了解相关属性。 
-    // 悬停以查看现有属性的描述。
-    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "type": "stlinkgdbtarget",
             "request": "launch",
-            "name": "STM32Cube: Launch ST-Link GDB Server",
+            "name": "STM32Cube: Debug bootloader",
             "origin": "snippet",
             "cwd": "${workspaceFolder}",
             "preBuild": "${command:st-stm32-ide-debug-launch.build}",
             "runEntry": "main",
+            "deviceName": "STM32H750XBH6",
+            "deviceCore": "Cortex-M7",
+            "deviceTrustzone": "TZ-disabled",
+            "serverInterface": "SWD",
+            "serverInterfaceFrequency": "140",
+            "serverReset": "Connect under reset",
+            "serverVerify": true,
             "imagesAndSymbols": [
                 {
-                    "imageFileName": "${command:st-stm32-ide-debug-launch.get-projects-binary-from-context1}"
+                    "imageFileName": "${workspaceFolder}/build/Release/H750_TouchGFX_bootloader.elf",
+                    "symbolFileName": "${workspaceFolder}/build/Release/H750_TouchGFX_bootloader.elf"
                 }
             ]
         }

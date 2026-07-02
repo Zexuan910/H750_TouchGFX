@@ -70,7 +70,6 @@ void touchgfx_taskEntry()
      *
      * Note This function returns immediately if there is no VSYNC signal.
      */
-    OSWrappers::signalVSync();
     if (OSWrappers::isVSyncAvailable())
     {
         hal.backPorchExited();

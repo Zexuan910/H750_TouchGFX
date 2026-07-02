@@ -57,10 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#ifndef ENABLE_CST816T_TOUCH
-#define ENABLE_CST816T_TOUCH 0
-#endif
-
 #define LCD_SDA_Pin GPIO_PIN_5
 #define LCD_SDA_GPIO_Port GPIOB
 #define LCD_SCK_Pin GPIO_PIN_11
@@ -71,9 +67,6 @@ void Error_Handler(void);
 #define LCD_RST_GPIO_Port GPIOJ
 #define LCD_CS_Pin GPIO_PIN_6
 #define LCD_CS_GPIO_Port GPIOJ
-#define LCD_BL_Pin GPIO_PIN_8
-#define LCD_BL_GPIO_Port GPIOA
-
 #define QSPI_CLK_Pin GPIO_PIN_2
 #define QSPI_CLK_GPIO_Port GPIOB
 #define QSPI_NCS_Pin GPIO_PIN_6
@@ -86,13 +79,6 @@ void Error_Handler(void);
 #define QSPI_BK1_IO2_GPIO_Port GPIOF
 #define QSPI_BK1_IO3_Pin GPIO_PIN_6
 #define QSPI_BK1_IO3_GPIO_Port GPIOF
-
-#if ENABLE_CST816T_TOUCH
-#define CTP_SCL_Pin GPIO_PIN_6
-#define CTP_SCL_GPIO_Port GPIOB
-#define CTP_SDA_Pin GPIO_PIN_7
-#define CTP_SDA_GPIO_Port GPIOB
-#endif
 
 /* USER CODE BEGIN Private defines */
 

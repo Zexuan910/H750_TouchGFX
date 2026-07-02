@@ -18,8 +18,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-# Set the project name
-set(CMAKE_PROJECT_NAME H750_TouchGFX)
+set(APP_TARGET H750_TouchGFX_app)
+set(BOOTLOADER_TARGET H750_TouchGFX_bootloader)
+
+# Set the project name used by generated CubeMX/TouchGFX CMake fragments.
+set(CMAKE_PROJECT_NAME ${APP_TARGET})
 
 set(UI_BACKEND "TOUCHGFX" CACHE STRING "UI backend: MINI or TOUCHGFX")
 set_property(CACHE UI_BACKEND PROPERTY STRINGS MINI TOUCHGFX)
@@ -40,8 +43,8 @@ message("Build type: " ${CMAKE_BUILD_TYPE})
 # Enable CMake support for ASM and C languages
 enable_language(C ASM)
 
-# Create an executable object type
-add_executable(${CMAKE_PROJECT_NAME})
+# Create the QSPI application executable.
+add_executable(${APP_TARGET})
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -57,54 +60,81 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 # Add sources to executable
-target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    Core/Src/spi.c
-    Core/Src/tim.c
+target_sources(${APP_TARGET} PRIVATE
     Core/Src/lcd_port.c
-    Core/Src/qspi.c
-    Core/Src/norflash.c
-    Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c
-    Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c
-    Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_qspi.c
 )
 
 if(ENABLE_CST816T_TOUCH)
-    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    target_sources(${APP_TARGET} PRIVATE
         Core/Src/i2c.c
         Core/Src/cst816t.c
     )
 endif()
 
 if(UI_BACKEND STREQUAL "TOUCHGFX")
-    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    target_sources(${APP_TARGET} PRIVATE
         Core/Src/ui_touchgfx.c
     )
 else()
-    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+    target_sources(${APP_TARGET} PRIVATE
         Core/Src/ui_mini.c
     )
 endif()
 
 # Add include paths
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+target_include_directories(${APP_TARGET} PRIVATE
     # Add user defined include paths
 )
 
 # Add project symbols (macros)
-target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+target_compile_definitions(${APP_TARGET} PRIVATE
     UI_BACKEND_${UI_BACKEND}
     ENABLE_CST816T_TOUCH=$<BOOL:${ENABLE_CST816T_TOUCH}>
+    APP_EXECUTES_FROM_QSPI=1
 )
 
 # Remove wrong libob.a library dependency when using cpp files
 list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 
 # Add linked libraries
-target_link_libraries(${CMAKE_PROJECT_NAME}
+target_link_libraries(${APP_TARGET}
     stm32cubemx
 
     # Add user defined libraries
 )
+
+add_executable(${BOOTLOADER_TARGET})
+target_sources(${BOOTLOADER_TARGET} PRIVATE
+    Core/Src/bootloader_main.c
+    Core/Src/qspi.c
+    Core/Src/norflash.c
+    Core/Src/syscalls.c
+    Core/Src/sysmem.c
+    startup_stm32h750xx.s
+)
+target_compile_definitions(${BOOTLOADER_TARGET} PRIVATE
+    BOOTLOADER_BUILD=1
+)
+target_link_libraries(${BOOTLOADER_TARGET} PRIVATE
+    stm32cubemx
+    STM32_Drivers
+    ${TOOLCHAIN_LINK_LIBRARIES}
+)
+
+function(configure_stm32_firmware_target target linker_script)
+    target_link_options(${target} PRIVATE
+        "-T${CMAKE_SOURCE_DIR}/${linker_script}"
+        "-Wl,-Map=${target}.map"
+        "-Wl,--gc-sections"
+        "-Wl,--print-memory-usage"
+    )
+    set_target_properties(${target} PROPERTIES
+        ADDITIONAL_CLEAN_FILES "${target}.map"
+    )
+endfunction()
+
+configure_stm32_firmware_target(${APP_TARGET} STM32H750XX_QSPI_APP.ld)
+configure_stm32_firmware_target(${BOOTLOADER_TARGET} STM32H750XX_BOOTLOADER.ld)
 
 get_filename_component(TOOLCHAIN_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
 find_program(ARM_OBJCOPY arm-none-eabi-objcopy
@@ -115,46 +145,18 @@ if(NOT ARM_OBJCOPY)
     set(ARM_OBJCOPY "${CMAKE_OBJCOPY}")
 endif()
 
-set(FLASH_ARTIFACT_BASE "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}")
-set(INTERNAL_FLASH_SECTIONS
-    .isr_vector
-    .text
-    .rodata
-    .ARM
-    .preinit_array
-    .init_array
-    .fini_array
-    .data
-    TouchGFX_ScratchbufferB
-    TouchGFX_ScratchbufferA
-)
-
-set(INTERNAL_FLASH_SECTION_ARGS)
-foreach(section_name IN LISTS INTERNAL_FLASH_SECTIONS)
-    list(APPEND INTERNAL_FLASH_SECTION_ARGS "--only-section=${section_name}")
-endforeach()
-
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-    COMMAND "${ARM_OBJCOPY}" -O ihex
-            "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-            "${FLASH_ARTIFACT_BASE}.hex"
-    COMMAND "${ARM_OBJCOPY}" -O ihex
-            ${INTERNAL_FLASH_SECTION_ARGS}
-            "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-            "${FLASH_ARTIFACT_BASE}_internal.hex"
-    COMMENT "Generating full and internal STM32 flash HEX files"
-)
-
-if(UI_BACKEND STREQUAL "TOUCHGFX")
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+function(add_firmware_artifacts target)
+    set(FLASH_ARTIFACT_BASE "${CMAKE_CURRENT_BINARY_DIR}/${target}")
+    add_custom_command(TARGET ${target} POST_BUILD
         COMMAND "${ARM_OBJCOPY}" -O ihex
-                --only-section=TouchGFX_ExtFlash
-                "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-                "${FLASH_ARTIFACT_BASE}_extflash.hex"
+                "$<TARGET_FILE:${target}>"
+                "${FLASH_ARTIFACT_BASE}.hex"
         COMMAND "${ARM_OBJCOPY}" -O binary
-                --only-section=TouchGFX_ExtFlash
-                "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-                "${FLASH_ARTIFACT_BASE}_extflash.bin"
-        COMMENT "Generating TouchGFX external flash artifacts"
+                "$<TARGET_FILE:${target}>"
+                "${FLASH_ARTIFACT_BASE}.bin"
+        COMMENT "Generating ${target} HEX and BIN files"
     )
-endif()
+endfunction()
+
+add_firmware_artifacts(${APP_TARGET})
+add_firmware_artifacts(${BOOTLOADER_TARGET})

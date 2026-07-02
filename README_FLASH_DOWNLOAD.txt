@@ -1,50 +1,92 @@
-H750_TouchGFX download notes
+H750_TouchGFX bootloader + QSPI app download notes
 
 This project uses STM32H750XBH6, whose internal Flash is only 128KB. The
-TouchGFX images, fonts, and texts are intentionally placed in the linker
-section TouchGFX_ExtFlash at address 0x90000000. Do not remove those assets to
-make the firmware smaller if the full UI is required.
+firmware is split into two images:
 
-After a successful build, CMake generates these files in the build directory:
+- H750_TouchGFX_bootloader
+  Runs from internal Flash at 0x08000000. It initializes the clock tree,
+  initializes the W25Q64JV QSPI NOR Flash, enables QSPI memory-mapped mode,
+  validates the application vector table, relocates VTOR to 0x90000000, and
+  jumps to the QSPI application reset handler.
 
-- H750_TouchGFX.hex
-  Full Intel HEX. It contains both the internal Flash records at 0x08000000 and
-  the TouchGFX external Flash records at 0x90000000.
+- H750_TouchGFX_app
+  Runs from external QSPI NOR Flash at 0x90000000. Its vector table, code,
+  read-only data, and TouchGFX image/font/text resources are all linked into
+  the 8MB QSPI window. The TouchGFX framebuffer remains in AXI SRAM at
+  0x24000000.
 
-- H750_TouchGFX_internal.hex
-  Internal Flash only. This is enough for the MCU program, but not enough for
-  the complete TouchGFX UI resources.
+Generated artifacts after a successful build:
 
-- H750_TouchGFX_extflash.hex
-  TouchGFX external Flash only, addressed at 0x90000000.
+- build/<Config>/H750_TouchGFX_bootloader.elf
+- build/<Config>/H750_TouchGFX_bootloader.hex
+- build/<Config>/H750_TouchGFX_bootloader.bin
+- build/<Config>/H750_TouchGFX_app.elf
+- build/<Config>/H750_TouchGFX_app.hex
+- build/<Config>/H750_TouchGFX_app.bin
 
-- H750_TouchGFX_extflash.bin
-  Raw TouchGFX external Flash payload. Program it at external Flash offset 0,
-  which maps to MCU address 0x90000000 after QSPI memory-mapped mode is enabled.
+Download sequence:
 
-If STM32CubeProgrammer or VS Code fails while downloading the full HEX/ELF, the
-usual cause is that no matching external loader is selected for the board's
-QSPI/NOR Flash. The internal 0x08000000 area can be programmed with the normal
-STM32H750 algorithm, but 0x90000000 requires a board-specific external loader
-or another trusted method to write the QSPI Flash.
+1. Program the app to QSPI NOR Flash with the board-specific external loader.
+   Do this before running the bootloader. If the bootloader is already running,
+   it can leave QSPI in memory-mapped mode and the external loader may fail
+   with "failed to download Segment[0]".
 
-The ALIENTEK H750 example project configures two Keil download algorithms:
+   STM32_Programmer_CLI -c port=SWD mode=UR -el ATK-DNH750_QSPI_W25Q64JV.stldr -w build/Release/H750_TouchGFX_app.hex -v
 
-- STM32H7x_128k.FLM at 0x08000000, size 0x020000
-- ATK-DNH750_QSPI_W25Q64JV at 0x90000000, size 0x800000
+   Or with the raw binary:
 
-That matches this project: internal code goes to 0x08000000, full TouchGFX
-resources go to the W25Q64JV external Flash window at 0x90000000.
+   STM32_Programmer_CLI -c port=SWD mode=UR -el ATK-DNH750_QSPI_W25Q64JV.stldr -w build/Release/H750_TouchGFX_app.bin 0x90000000 -v
 
-Current repository evidence:
+2. Program the bootloader to internal Flash, then reset into it:
 
-- TouchGFX/application.config places image assets in ExtFlashSection.
-- STM32H750XX_FLASH.ld maps TouchGFX_ExtFlash to EXTERNAL_FLASH at 0x90000000.
-- The supplied ALIENTEK QSPI example maps W25Q64JV QSPI as PB2=CLK, PB6=NCS,
-  PF8=IO0, PF9=IO1, PF7=IO2, PF6=IO3.
-- This project now gives PB6 to QSPI_NCS by default and disables the CST816T
-  PB6/PB7 touch path unless CMake is configured with ENABLE_CST816T_TOUCH=ON.
-  Keep that option OFF until the touch controller has been moved to pins that
-  do not conflict with the ALIENTEK W25Q64JV QSPI wiring.
-- Startup initializes W25Q64JV, checks the JEDEC ID against supported Winbond
-  IDs, enables QSPI memory-mapped mode, and only then starts TouchGFX.
+   STM32_Programmer_CLI -c port=SWD mode=UR -w build/Release/H750_TouchGFX_bootloader.hex -v -rst
+
+STM32CubeProgrammer GUI notes:
+
+- Prefer "Under Reset" for both downloads.
+- For the QSPI app step, select `ATK-DNH750_QSPI_W25Q64JV.stldr`, program
+  `H750_TouchGFX_app.hex`, and do not run at `0x90000000`.
+- Program `H750_TouchGFX_bootloader.hex` last. Only after this final step should
+  the board reset or run from `0x08000000`.
+- If you already ran the bootloader before programming the app, power-cycle the
+  board or reconnect under reset before retrying the QSPI app download.
+
+Helper script:
+
+   powershell -ExecutionPolicy Bypass -File tools/program_qspi_split.ps1 -Config Release -LoaderPath path\to\ATK-DNH750_QSPI_W25Q64JV.stldr
+
+   To print the exact commands without flashing hardware:
+
+   powershell -ExecutionPolicy Bypass -File tools/program_qspi_split.ps1 -Config Release -DryRun
+
+VS Code debug:
+
+- The checked-in `.vscode/launch.json` intentionally loads only
+  `build/Release/H750_TouchGFX_bootloader.elf`.
+- Do not use VS Code/ST-LINK GDB `load` on `H750_TouchGFX_app.elf` or the
+  stale single-image `H750_TouchGFX.elf`, because both contain QSPI addresses
+  at 0x90000000 that require an external loader.
+- After the app is programmed with the external loader, debug the bootloader
+  path or attach/load symbols without re-downloading the QSPI app.
+
+Important:
+
+- The app cannot be programmed to 0x90000000 with only the normal internal
+  STM32H750 Flash algorithm. Use the ALIENTEK W25Q64JV external loader
+  (`ATK-DNH750_QSPI_W25Q64JV`) or an equivalent board-specific loader.
+- Place a matching STM32CubeProgrammer `.stldr` under `tools/loaders/` or pass
+  it with `-LoaderPath`. A Keil/MDK `.FLM` may be kept there as reference, but
+  it cannot be used directly with `STM32_Programmer_CLI -el`.
+- The app must not reinitialize, abort, erase, or reconfigure QSPI while it is
+  executing from QSPI. The bootloader owns QSPI setup and memory-mapped mode.
+- `PB6` remains `QSPI_NCS`. Keep `ENABLE_CST816T_TOUCH=OFF` unless the touch
+  controller wiring has been moved away from PB6/PB7.
+- NAND and SDRAM are not used by this split. NAND should be reserved for future
+  file storage or OTA packages, not direct code execution.
+
+Repository evidence:
+
+- QSPI wiring: PB2=CLK, PB6=NCS, PF8=IO0, PF9=IO1, PF7=IO2, PF6=IO3.
+- Bootloader linker script: `STM32H750XX_BOOTLOADER.ld`.
+- QSPI app linker script: `STM32H750XX_QSPI_APP.ld`.
+- Layout verification script: `tools/verify_qspi_bootloader_layout.ps1`.
