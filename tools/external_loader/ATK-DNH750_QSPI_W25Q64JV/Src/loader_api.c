@@ -26,6 +26,7 @@ static int loader_ready;
 
 static int loader_system_clock_config(void);
 static int open_flash(void);
+static int erase_range_to_offsets(uint32_t start, uint32_t end, uint32_t *start_offset, uint32_t *end_offset);
 
 static int address_to_offset(uint32_t address, uint32_t size, uint32_t *offset)
 {
@@ -53,6 +54,48 @@ static int address_to_offset(uint32_t address, uint32_t size, uint32_t *offset)
   }
 
   return 1;
+}
+
+static int sector_index_to_offset(uint32_t sector_index, uint32_t *offset)
+{
+  if (sector_index >= LOADER_SECTOR_COUNT)
+  {
+    return 0;
+  }
+
+  if (offset != NULL)
+  {
+    *offset = sector_index * LOADER_SECTOR_SIZE;
+  }
+
+  return 1;
+}
+
+static int erase_range_to_offsets(uint32_t start, uint32_t end, uint32_t *start_offset, uint32_t *end_offset)
+{
+  uint32_t local_start = 0U;
+  uint32_t local_end = 0U;
+
+  if (end < start)
+  {
+    return 0;
+  }
+
+  if (address_to_offset(start, 1U, &local_start) && address_to_offset(end, 1U, &local_end))
+  {
+    *start_offset = local_start & ~(LOADER_SECTOR_SIZE - 1U);
+    *end_offset = local_end & ~(LOADER_SECTOR_SIZE - 1U);
+    return 1;
+  }
+
+  if (sector_index_to_offset(start, &local_start) && sector_index_to_offset(end, &local_end))
+  {
+    *start_offset = local_start;
+    *end_offset = local_end;
+    return 1;
+  }
+
+  return 0;
 }
 
 static int ensure_ready(void)
@@ -234,17 +277,12 @@ int SectorErase(uint32_t EraseStartAddress, uint32_t EraseEndAddress)
 
   LOADER_DEBUG_MARK(LOADER_DBG_ERASE_START, EraseStartAddress, EraseEndAddress, 0U);
 
-  if ((EraseEndAddress < EraseStartAddress) ||
-      !address_to_offset(EraseStartAddress, 1U, &start_offset) ||
-      !address_to_offset(EraseEndAddress, 1U, &end_offset) ||
+  if (!erase_range_to_offsets(EraseStartAddress, EraseEndAddress, &start_offset, &end_offset) ||
       !open_flash())
   {
     LOADER_DEBUG_MARK(LOADER_DBG_ERASE_FAIL, EraseStartAddress, EraseEndAddress, 0U);
     return 0;
   }
-
-  start_offset &= ~(LOADER_SECTOR_SIZE - 1U);
-  end_offset &= ~(LOADER_SECTOR_SIZE - 1U);
 
   address = start_offset;
   while (address <= end_offset)

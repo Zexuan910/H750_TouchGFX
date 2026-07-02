@@ -43,11 +43,20 @@ Download sequence:
 
 STM32CubeProgrammer GUI notes:
 
-- Prefer "Under Reset" for both downloads.
+- Use "Under Reset" for both downloads. If the log says
+  `Connect mode: Hot Plug`, reconnect with Under Reset before programming the
+  QSPI app.
+- Prefer STM32CubeProgrammer 2.22 or newer, or use the helper script which
+  resolves the bundled 2.22 CLI. Older GUIs such as API 2.6 can call external
+  loader erase with sector-index ranges; the checked-in loader keeps backward
+  compatibility with that behavior.
 - For the QSPI app step, select `ATK-DNH750_QSPI_W25Q64JV.stldr`, program
   `H750_TouchGFX_app.hex`, and do not run at `0x90000000`.
 - Program `H750_TouchGFX_bootloader.hex` last. Only after this final step should
   the board reset or run from `0x08000000`.
+- If the QSPI app step fails, do not program or run the bootloader yet; it will
+  jump to an invalid/unprogrammed QSPI app and can lock the core, hiding the
+  original external-loader failure.
 - If you already ran the bootloader before programming the app, power-cycle the
   board or reconnect under reset before retrying the QSPI app download.
 
@@ -81,6 +90,11 @@ Important:
   executing from QSPI. The bootloader owns QSPI setup and memory-mapped mode.
 - `PB6` remains `QSPI_NCS`. Keep `ENABLE_CST816T_TOUCH=OFF` unless the touch
   controller wiring has been moved away from PB6/PB7.
+- The Polaris schematic for the W25Q64 code flash confirms:
+  `PB2=CLK, PB6=NCS, PF8=IO0, PF9=IO1, PF7=IO2, PF6=IO3`.
+  Do not swap PF8/PF9 based on text extraction or copied pin lists.
+- The external-loader `StorageInfo.PageSize` is the W25Q page-program size
+  `0x100`, while erase sectors remain `0x1000`.
 - NAND and SDRAM are not used by this split. NAND should be reserved for future
   file storage or OTA packages, not direct code execution.
 
@@ -90,3 +104,4 @@ Repository evidence:
 - Bootloader linker script: `STM32H750XX_BOOTLOADER.ld`.
 - QSPI app linker script: `STM32H750XX_QSPI_APP.ld`.
 - Layout verification script: `tools/verify_qspi_bootloader_layout.ps1`.
+- Board pinout verification script: `tools/verify_board_pinout.ps1`.

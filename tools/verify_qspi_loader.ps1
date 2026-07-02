@@ -69,6 +69,7 @@ $objcopy = Resolve-ArmTool "arm-none-eabi-objcopy.exe"
 
 $nmOutput = Invoke-Tool $nm @($LoaderPath)
 $readelfOutput = Invoke-Tool $readelf @("-S", $LoaderPath)
+$readelfProgramOutput = Invoke-Tool $readelf @("-l", $LoaderPath)
 
 $requiredSymbols = @(
     "StorageInfo",
@@ -102,6 +103,27 @@ if (-not ($readelfOutput | Where-Object { $_ -match "\s+PROGBITS\s+2000[0-9a-fA-
     throw "No loadable code/rodata section was found in the 0x20000000 RAM loader window"
 }
 
+$ramLoadSegments = @()
+foreach ($line in $readelfProgramOutput) {
+    if ($line -match "^\s+LOAD\s+0x[0-9A-Fa-f]+\s+0x([0-9A-Fa-f]+)\s+0x[0-9A-Fa-f]+\s+0x[0-9A-Fa-f]+\s+0x[0-9A-Fa-f]+\s+(.+?)\s+0x[0-9A-Fa-f]+\s*$") {
+        $vma = [Convert]::ToUInt32($Matches[1], 16)
+        if (($vma -ge 0x20000000) -and ($vma -lt 0x20020000)) {
+            $ramLoadSegments += [PSCustomObject]@{
+                Line = $line
+                Flags = ($Matches[2] -replace "\s", "")
+            }
+        }
+    }
+}
+
+if ($ramLoadSegments.Count -ne 1) {
+    throw ("External loader must use one contiguous RAM PT_LOAD segment; found {0}. CubeProgrammer can mis-handle split text/data loader images." -f $ramLoadSegments.Count)
+}
+
+if ($ramLoadSegments[0].Flags -ne "RWE") {
+    throw ("External-loader RAM PT_LOAD segment must be RWE, got flags '{0}'." -f $ramLoadSegments[0].Flags)
+}
+
 $temp = [System.IO.Path]::GetTempFileName()
 try {
     Invoke-Tool $objcopy @("-O", "binary", "-j", ".Dev_Info", $LoaderPath, $temp) | Out-Null
@@ -133,7 +155,7 @@ if ($deviceType -ne 3) {
 }
 $expectedStart = [Convert]::ToUInt32("90000000", 16)
 $expectedSize = [Convert]::ToUInt32("00800000", 16)
-$expectedPageSize = [Convert]::ToUInt32("00001000", 16)
+$expectedPageSize = [Convert]::ToUInt32("00000100", 16)
 $expectedEraseValue = [Convert]::ToUInt32("000000FF", 16)
 $expectedSectorSize = [Convert]::ToUInt32("00001000", 16)
 
@@ -154,6 +176,33 @@ if (($sectorCount -ne 2048) -or ($sectorSize -ne $expectedSectorSize)) {
 }
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+$loaderHeader = Join-Path $repoRoot "tools\external_loader\ATK-DNH750_QSPI_W25Q64JV\Inc\loader_api.h"
+if (Test-Path -LiteralPath $loaderHeader) {
+    $loaderHeaderText = Get-Content -LiteralPath $loaderHeader -Raw
+    if (-not $loaderHeaderText.Contains("#define LOADER_WRITE_BLOCK_SIZE  0x00000100U")) {
+        throw "External-loader StorageInfo PageSize must match the W25Q page-program size: 0x100."
+    }
+}
+
+$loaderApi = Join-Path $repoRoot "tools\external_loader\ATK-DNH750_QSPI_W25Q64JV\Src\loader_api.c"
+if (Test-Path -LiteralPath $loaderApi) {
+    $loaderApiText = Get-Content -LiteralPath $loaderApi -Raw
+    if (-not $loaderApiText.Contains("erase_range_to_offsets") -or
+        -not $loaderApiText.Contains("LOADER_SECTOR_COUNT") -or
+        -not $loaderApiText.Contains("LOADER_SECTOR_SIZE")) {
+        throw "SectorErase must accept both absolute addresses and legacy sector-index ranges."
+    }
+}
+
+$qspiSource = Join-Path $repoRoot "Core\Src\qspi.c"
+if (Test-Path -LiteralPath $qspiSource) {
+    $qspiText = Get-Content -LiteralPath $qspiSource -Raw
+    if (-not $qspiText.Contains("__HAL_RCC_QSPI_FORCE_RESET()") -or
+        -not $qspiText.Contains("__HAL_RCC_QSPI_RELEASE_RESET()")) {
+        throw "External-loader QSPI init must force-reset QUADSPI before reuse."
+    }
+}
+
 $debugHeader = Join-Path $repoRoot "tools\external_loader\ATK-DNH750_QSPI_W25Q64JV\Inc\loader_debug.h"
 if (Test-Path -LiteralPath $debugHeader) {
     $debugBaseLine = Get-Content -LiteralPath $debugHeader |

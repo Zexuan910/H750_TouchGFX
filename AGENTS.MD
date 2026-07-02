@@ -60,6 +60,7 @@ cmake --build --preset Release
   - `PF9`：QSPI_BK1_IO1
   - `PF7`：QSPI_BK1_IO2
   - `PF6`：QSPI_BK1_IO3
+- 2026-07-02 已用北极星 W25Q64 代码 Flash 原理图页确认：`PF8=IO0`、`PF9=IO1` 是正确线序。不要因为 PDF 文字抽取或其他摘录把 PF8/PF9 互换。
 - 正确烧录顺序：
   1. 先用 STM32CubeProgrammer 外部 loader 把 `H750_TouchGFX_app` 写到 QSPI `0x90000000`。
   2. 再把 `H750_TouchGFX_bootloader` 写到内部 Flash `0x08000000` 并复位运行。
@@ -72,6 +73,11 @@ powershell -ExecutionPolicy Bypass -File tools/program_qspi_split.ps1 -Config Re
 
 - `tools/loaders/ATK-DNH750_QSPI_W25Q64JV.stldr` 是 STM32CubeProgrammer 需要的外部 loader。`.FLM` 是 Keil/MDK flash algorithm，不能直接改名当 `.stldr` 用。
 - 如果 bootloader 已经运行过，可能把 QSPI 留在 memory-mapped 模式，导致外部 loader 下载 app 失败；此时使用 Under Reset 连接，必要时断电重连。
+- STM32CubeProgrammer GUI 日志必须显示 `Connect mode: Under Reset` 或等效 under-reset 连接；如果显示 `Hot Plug`，不要继续判断外部 loader 结果，先改连接模式重试。
+- 优先使用 STM32CubeProgrammer 2.22 或更新版本；如果 GUI 日志显示 `STM32CubeProgrammer API v2.6.0`，建议改用 `tools/program_qspi_split.ps1` 找到的 2.22 CLI，或至少确认 `.stldr` 是当前仓库最新生成的文件。
+- 旧版 CubeProgrammer 可能用扇区号范围调用 `SectorErase()`，因此外部 loader 需要同时兼容绝对地址范围和扇区号范围。`StorageInfo.PageSize` 应保持 W25Q 页编程大小 `0x100`，不是 4KB 擦除扇区大小。
+- `Core/Src/qspi.c` 会在 QSPI MSP init 时强制 reset/release QUADSPI 外设，用于清掉 bootloader 或上一次外部 loader 留下的 memory-mapped/忙状态。
+- QSPI app 烧录失败时，不要继续写入或运行 bootloader；bootloader 会尝试跳到未烧好的 `0x90000000` app，容易导致 core lockup，使后续验证日志变复杂。
 - `.vscode/launch.json` 当前只加载 `build/Release/H750_TouchGFX_bootloader.elf`。不要让 ST-LINK GDB 直接 `load` app ELF，因为 app 地址在 `0x90000000`，需要外部 loader。
 
 ## LCD 显示链路
@@ -135,6 +141,12 @@ cmake --build --preset Release
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools/verify_qspi_bootloader_layout.ps1 -Config Release
+```
+
+- 验证板级 QSPI/LCD 引脚：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/verify_board_pinout.ps1
 ```
 
 - 构建外部 loader：

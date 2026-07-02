@@ -9,8 +9,7 @@ MEMORY
 PHDRS
 {
   devinfo PT_LOAD FLAGS(4);
-  text PT_LOAD FLAGS(5);
-  data PT_LOAD FLAGS(6);
+  ram PT_LOAD FLAGS(7);
 }
 
 SECTIONS
@@ -28,24 +27,24 @@ SECTIONS
     *(.glue_7)
     *(.glue_7t)
     . = ALIGN(4);
-  } > RAM :text
+  } > RAM :ram
 
   .ARM.extab :
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
-  } > RAM :text
+  } > RAM :ram
 
   .ARM.exidx :
   {
     *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-  } > RAM :text
+  } > RAM :ram
 
   .data :
   {
     . = ALIGN(4);
     *(.data*)
     . = ALIGN(4);
-  } > RAM :data
+  } > RAM :ram
 
   .bss (NOLOAD) :
   {
@@ -53,7 +52,7 @@ SECTIONS
     *(.bss*)
     *(COMMON)
     . = ALIGN(4);
-  } > RAM :data
+  } > RAM :ram
 
   /DISCARD/ :
   {

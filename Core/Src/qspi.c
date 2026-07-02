@@ -63,6 +63,9 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
     }
 
     __HAL_RCC_QSPI_CLK_ENABLE();
+    __HAL_RCC_QSPI_FORCE_RESET();
+    __HAL_RCC_QSPI_RELEASE_RESET();
+
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
 

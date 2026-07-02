@@ -27,6 +27,7 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen2_screen/Screen2View.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen3_screen/Screen3Presenter.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen3_screen/Screen3View.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen_screen/screenView.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/ApplicationFontProvider.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CachedFont.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CompressedFontCache.cpp

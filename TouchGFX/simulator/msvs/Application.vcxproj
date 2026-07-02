@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\gui\src\screen1_screen\screen1Presenter.cpp"/>
     <ClCompile Include="..\..\gui\src\screen1_screen\screen1View.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\screen1_screen\screen1ViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml"/>
