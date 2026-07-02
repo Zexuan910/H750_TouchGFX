@@ -208,9 +208,6 @@
     <Filter Include="Header Files\generated\gui_generated\screen3_screen">
       <UniqueIdentifier>19F4ECE1-457F-8609-4A80-2BCD83899D33</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\gui\screen_screen">
-      <UniqueIdentifier>1134C216-8622-8B6F-35E5-AE08E9DE8861</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(TouchGFXReleasePath)\framework\source\platform\driver\touch\SDL2TouchController.cpp">
@@ -269,9 +266,6 @@
     </ClCompile>
     <ClCompile Include="..\..\generated\gui_generated\src\screen1_screen\screen1ViewBase.cpp">
       <Filter>Source Files\generated\gui_generated\screen1_screen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp">
-      <Filter>Source Files\gui\screen_screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
