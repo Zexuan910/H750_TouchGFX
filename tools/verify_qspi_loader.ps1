@@ -153,4 +153,22 @@ if (($sectorCount -ne 2048) -or ($sectorSize -ne $expectedSectorSize)) {
     throw ("Unexpected sector geometry: {0} x 0x{1:X}" -f $sectorCount, $sectorSize)
 }
 
+$repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+$debugHeader = Join-Path $repoRoot "tools\external_loader\ATK-DNH750_QSPI_W25Q64JV\Inc\loader_debug.h"
+if (Test-Path -LiteralPath $debugHeader) {
+    $debugBaseLine = Get-Content -LiteralPath $debugHeader |
+        Where-Object { $_ -match "^\s*#define\s+LOADER_DEBUG_BASE\s+0x([0-9A-Fa-f]+)U" } |
+        Select-Object -First 1
+
+    if ($debugBaseLine) {
+        $debugBase = [Convert]::ToUInt32(([regex]::Match($debugBaseLine, "0x([0-9A-Fa-f]+)U").Groups[1].Value), 16)
+        $ramStart = [Convert]::ToUInt32("20000000", 16)
+        $ramEnd = [Convert]::ToUInt32("20020000", 16)
+        $stackGuard = [Convert]::ToUInt32("00001000", 16)
+        if (($debugBase -lt $ramStart) -or ($debugBase -ge ($ramEnd - $stackGuard))) {
+            throw ("LOADER_DEBUG_BASE must stay out of the external-loader stack guard: 0x{0:X8}" -f $debugBase)
+        }
+    }
+}
+
 Write-Host "QSPI loader verification passed: $LoaderPath"

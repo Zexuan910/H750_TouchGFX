@@ -3,8 +3,10 @@
 
 #include <stdint.h>
 
-#define LOADER_DEBUG_BASE   0x2001FFE0U
+/* Keep debug records away from the external loader stack at the top of SRAM. */
+#define LOADER_DEBUG_BASE   0x20004000U
 #define LOADER_DEBUG_MAGIC  0x51445049U
+#define LOADER_DEBUG_HISTORY_COUNT 16U
 
 #define LOADER_DBG_INIT_START          0x00000100U
 #define LOADER_DBG_INIT_HAL_FAIL       0x00000101U
@@ -21,6 +23,10 @@
 
 #define LOADER_DBG_READ_START          0x00000200U
 #define LOADER_DBG_READ_DONE           0x00000201U
+#define LOADER_DBG_READ_BUFFER_OK      0x00000202U
+#define LOADER_DBG_READ_ADDR_OK        0x00000203U
+#define LOADER_DBG_READ_OPEN_OK        0x00000204U
+#define LOADER_DBG_READ_PRE_NOR        0x00000205U
 #define LOADER_DBG_WRITE_START         0x00000300U
 #define LOADER_DBG_WRITE_DONE          0x00000301U
 #define LOADER_DBG_WRITE_FAIL          0x00000302U
@@ -45,6 +51,10 @@
 #define LOADER_DBG_NOR_QUAD_WRITE_FAIL 0x00000531U
 #define LOADER_DBG_NOR_READ_ID         0x00000540U
 #define LOADER_DBG_NOR_READ_FAIL       0x00000550U
+#define LOADER_DBG_NOR_READ_CMD_START  0x00000551U
+#define LOADER_DBG_NOR_READ_CMD_DONE   0x00000552U
+#define LOADER_DBG_NOR_READ_RX_START   0x00000553U
+#define LOADER_DBG_NOR_READ_RX_DONE    0x00000554U
 #define LOADER_DBG_NOR_WRITE_PAGE      0x00000560U
 #define LOADER_DBG_NOR_WRITE_PAGE_FAIL 0x00000561U
 #define LOADER_DBG_NOR_ERASE_CMD       0x00000570U
@@ -77,6 +87,8 @@ static inline void loader_debug_mark(uint32_t stage,
   volatile uint32_t *record = (volatile uint32_t *)LOADER_DEBUG_BASE;
   uint32_t previous_stage = record[1];
   uint32_t previous_value0 = record[2];
+  uint32_t history_index = record[8];
+  volatile uint32_t *history_entry;
 
   record[0] = LOADER_DEBUG_MAGIC;
   record[1] = stage;
@@ -86,6 +98,19 @@ static inline void loader_debug_mark(uint32_t stage,
   record[5] = line;
   record[6] = previous_stage;
   record[7] = previous_value0;
+
+  if (history_index >= LOADER_DEBUG_HISTORY_COUNT)
+  {
+    history_index = 0U;
+  }
+
+  history_entry = &record[16U + (history_index * 5U)];
+  history_entry[0] = stage;
+  history_entry[1] = value0;
+  history_entry[2] = value1;
+  history_entry[3] = value2;
+  history_entry[4] = line;
+  record[8] = history_index + 1U;
 }
 
 #define LOADER_DEBUG_MARK(stage, value0, value1, value2) \

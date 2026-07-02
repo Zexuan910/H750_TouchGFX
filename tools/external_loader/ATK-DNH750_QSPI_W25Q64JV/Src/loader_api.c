@@ -178,11 +178,25 @@ int Read(uint32_t Address, uint32_t Size, uint8_t *Buffer)
 
   LOADER_DEBUG_MARK(LOADER_DBG_READ_START, Address, Size, (uint32_t)Buffer);
 
-  if ((Buffer == NULL) || !address_to_offset(Address, Size, &offset) || !open_flash())
+  if (Buffer == NULL)
   {
     return 0;
   }
+  LOADER_DEBUG_MARK(LOADER_DBG_READ_BUFFER_OK, Address, Size, (uint32_t)Buffer);
 
+  if (!address_to_offset(Address, Size, &offset))
+  {
+    return 0;
+  }
+  LOADER_DEBUG_MARK(LOADER_DBG_READ_ADDR_OK, Address, Size, offset);
+
+  if (!open_flash())
+  {
+    return 0;
+  }
+  LOADER_DEBUG_MARK(LOADER_DBG_READ_OPEN_OK, Address, Size, offset);
+
+  LOADER_DEBUG_MARK(LOADER_DBG_READ_PRE_NOR, Address, Size, offset);
   ok = (norflash_read(Buffer, offset, Size) == HAL_OK) ? 1 : 0;
   LOADER_DEBUG_MARK(LOADER_DBG_READ_DONE, Address, Size, (uint32_t)ok);
   return ok;

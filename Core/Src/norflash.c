@@ -25,6 +25,7 @@
 #define NORFLASH_STATUS_QE               0x02U
 #define NORFLASH_SECTOR_ERASE_TIMEOUT_MS 5000U
 #define NORFLASH_CHIP_ERASE_TIMEOUT_MS   200000U
+#define NORFLASH_QUAD_IO_DUMMY_CYCLES    6U
 
 static HAL_StatusTypeDef norflash_command(uint8_t instruction,
                                           uint32_t address_mode,
@@ -365,7 +366,7 @@ bool norflash_memory_mapped(void)
   command.AddressMode = QSPI_ADDRESS_4_LINES;
   command.AddressSize = QSPI_ADDRESS_24_BITS;
   command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
-  command.DummyCycles = 6;
+  command.DummyCycles = NORFLASH_QUAD_IO_DUMMY_CYCLES;
   command.DataMode = QSPI_DATA_4_LINES;
   command.DdrMode = QSPI_DDR_MODE_DISABLE;
   command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
@@ -384,23 +385,30 @@ HAL_StatusTypeDef norflash_read(uint8_t *buffer, uint32_t address, uint32_t leng
     return HAL_OK;
   }
 
+  LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_CMD_START, address, length, 0U);
   HAL_StatusTypeDef result = norflash_command(NORFLASH_CMD_FAST_READ_QUAD_IO,
                                              QSPI_ADDRESS_4_LINES,
                                              address,
                                              QSPI_ADDRESS_24_BITS,
-                                             6,
+                                             NORFLASH_QUAD_IO_DUMMY_CYCLES,
                                              QSPI_DATA_4_LINES,
                                              length);
+  LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_CMD_DONE, address, length, (uint32_t)result);
   if (result != HAL_OK)
   {
     LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_FAIL, address, length, (uint32_t)result);
     return result;
   }
 
+  LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_RX_START, address, length, 0U);
   result = HAL_QSPI_Receive(&hqspi, buffer, HAL_QSPI_TIMEOUT_DEFAULT_VALUE);
   if (result != HAL_OK)
   {
     LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_FAIL, address, length, (uint32_t)result);
+  }
+  else
+  {
+    LOADER_DEBUG_MARK(LOADER_DBG_NOR_READ_RX_DONE, address, length, 0U);
   }
 
   return result;
