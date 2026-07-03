@@ -72,6 +72,7 @@ static void JumpToApplication(void)
   __ISB();
 
   __set_MSP(app_stack);
+  __enable_irq();
   AppEntry app_entry = (AppEntry)app_reset;
   app_entry();
 }

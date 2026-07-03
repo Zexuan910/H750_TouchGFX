@@ -108,6 +108,7 @@ target_sources(${BOOTLOADER_TARGET} PRIVATE
     Core/Src/bootloader_main.c
     Core/Src/qspi.c
     Core/Src/norflash.c
+    Core/Src/stm32h7xx_it.c
     Core/Src/syscalls.c
     Core/Src/sysmem.c
     startup_stm32h750xx.s

@@ -13,7 +13,7 @@
 #include "spi.h"
 #include "tim.h"
 #include "gpio.h"
-#include "app_touchgfx.h"
+#include "ui.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -91,7 +91,7 @@ int main(void)
 #if !defined(APP_EXECUTES_FROM_QSPI) || (APP_EXECUTES_FROM_QSPI == 0)
   MX_QUADSPI_Init();
 #endif
-  MX_TouchGFX_Init();
+  UI_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -102,7 +102,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-  MX_TouchGFX_Process();
+  UI_Process();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
