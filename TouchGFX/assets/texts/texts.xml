@@ -88,6 +88,12 @@
       <Text Id="T_TITLE" Alignment="Center" TypographyId="Default">
         <Translation Language="GB">Hello TouchGFX</Translation>
       </Text>
+      <Text Id="T_SPORT_GLYPHS" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">SPORT Choose mode WALK RUN ROPE Distance pace Speed heart Count rhythm HR 82 1.26 km 00:18 98% SpO2 Now Avg Step Cad Kcal Time</Translation>
+      </Text>
+      <Text Id="T_WILDCARD_CENTER" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">&lt;value&gt;</Translation>
+      </Text>
     </TextGroup>
   </Texts>
   <Typographies>

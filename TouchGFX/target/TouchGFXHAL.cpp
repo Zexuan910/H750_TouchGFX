@@ -90,15 +90,13 @@ void TouchGFXHAL::flushFrameBuffer(const touchgfx::Rect& rect)
     uint8_t* fb = reinterpret_cast<uint8_t*>(getTFTFrameBuffer());
     const uint32_t stride = lcd().framebufferStride();
 
-    for (int16_t row = 0; row < rect.height; row++)
-    {
-        const uint16_t* pixels = reinterpret_cast<const uint16_t*>(fb + (rect.y + row) * stride + rect.x * 2);
-        LCD_WriteRectRGB565(static_cast<uint16_t>(rect.x),
-                            static_cast<uint16_t>(rect.y + row),
-                            static_cast<uint16_t>(rect.width),
-                            1U,
-                            pixels);
-    }
+    const uint16_t* pixels = reinterpret_cast<const uint16_t*>(fb + rect.y * stride + rect.x * 2);
+    LCD_WriteRectRGB565Strided(static_cast<uint16_t>(rect.x),
+                               static_cast<uint16_t>(rect.y),
+                               static_cast<uint16_t>(rect.width),
+                               static_cast<uint16_t>(rect.height),
+                               pixels,
+                               static_cast<uint16_t>(stride / 2U));
 }
 
 bool TouchGFXHAL::blockCopy(void* RESTRICT dest, const void* RESTRICT src, uint32_t numBytes)

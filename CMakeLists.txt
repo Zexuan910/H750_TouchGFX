@@ -31,7 +31,7 @@ if(NOT UI_BACKEND STREQUAL "MINI" AND NOT UI_BACKEND STREQUAL "TOUCHGFX")
     message(FATAL_ERROR "UI_BACKEND must be MINI or TOUCHGFX")
 endif()
 
-option(ENABLE_CST816T_TOUCH "Enable CST816T touch controller on the configured I2C pins" OFF)
+option(ENABLE_CST816T_TOUCH "Enable CST816T touch controller on the configured I2C pins" ON)
 
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -66,7 +66,6 @@ target_sources(${APP_TARGET} PRIVATE
 
 if(ENABLE_CST816T_TOUCH)
     target_sources(${APP_TARGET} PRIVATE
-        Core/Src/i2c.c
         Core/Src/cst816t.c
     )
 endif()
@@ -74,6 +73,7 @@ endif()
 if(UI_BACKEND STREQUAL "TOUCHGFX")
     target_sources(${APP_TARGET} PRIVATE
         Core/Src/ui_touchgfx.c
+        Core/Src/ui_touchgfx_vsync.cpp
     )
 else()
     target_sources(${APP_TARGET} PRIVATE

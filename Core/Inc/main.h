@@ -67,6 +67,12 @@ void Error_Handler(void);
 #define LCD_RST_GPIO_Port GPIOJ
 #define LCD_CS_Pin GPIO_PIN_6
 #define LCD_CS_GPIO_Port GPIOJ
+#define TINT_Pin GPIO_PIN_5
+#define TINT_GPIO_Port GPIOJ
+#define TRST_Pin GPIO_PIN_4
+#define TRST_GPIO_Port GPIOJ
+
+/* USER CODE BEGIN Private defines */
 #define QSPI_CLK_Pin GPIO_PIN_2
 #define QSPI_CLK_GPIO_Port GPIOB
 #define QSPI_NCS_Pin GPIO_PIN_6
@@ -79,8 +85,6 @@ void Error_Handler(void);
 #define QSPI_BK1_IO2_GPIO_Port GPIOF
 #define QSPI_BK1_IO3_Pin GPIO_PIN_6
 #define QSPI_BK1_IO3_GPIO_Port GPIOF
-
-/* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 

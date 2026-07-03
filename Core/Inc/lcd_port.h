@@ -25,6 +25,12 @@ void LCD_ClearRGB565(uint16_t color);
 void LCD_FillRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color);
 void LCD_DrawPixelRGB565(uint16_t x, uint16_t y, uint16_t color);
 void LCD_WriteRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* pixels);
+void LCD_WriteRectRGB565Strided(uint16_t x,
+                                uint16_t y,
+                                uint16_t width,
+                                uint16_t height,
+                                const uint16_t* pixels,
+                                uint16_t stridePixels);
 void LCD_DrawCenteredText(const char* text, uint16_t color, uint16_t bg_color, uint8_t scale);
 
 #ifdef __cplusplus

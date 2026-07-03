@@ -7,7 +7,7 @@
 #include <stddef.h>
 
 #define LCD_SPI_TIMEOUT_MS 1000U
-#define LCD_TX_PIXELS      64U
+#define LCD_TX_PIXELS      128U
 
 static void lcd_select(void)
 {
@@ -332,10 +332,20 @@ void LCD_DrawPixelRGB565(uint16_t x, uint16_t y, uint16_t color)
 
 void LCD_WriteRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint16_t* pixels)
 {
-  uint32_t remaining;
-  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  LCD_WriteRectRGB565Strided(x, y, width, height, pixels, width);
+}
 
-  if ((pixels == NULL) || (x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
+void LCD_WriteRectRGB565Strided(uint16_t x,
+                                uint16_t y,
+                                uint16_t width,
+                                uint16_t height,
+                                const uint16_t* pixels,
+                                uint16_t stridePixels)
+{
+  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  uint16_t row;
+
+  if ((pixels == NULL) || (stridePixels < width) || (x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
   {
     return;
   }
@@ -349,25 +359,30 @@ void LCD_WriteRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height
     height = (uint16_t)(LCD_PORT_HEIGHT - y);
   }
 
-  remaining = (uint32_t)width * height;
   lcd_select();
   lcd_set_window(x, y, (uint16_t)(x + width - 1U), (uint16_t)(y + height - 1U));
   lcd_data_mode();
 
-  while (remaining > 0U)
+  for (row = 0U; row < height; row++)
   {
-    uint16_t chunk = (remaining > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)remaining;
-    uint16_t i;
+    const uint16_t* rowPixels = pixels + (uint32_t)row * stridePixels;
+    uint16_t sent = 0U;
 
-    for (i = 0U; i < chunk; i++)
+    while (sent < width)
     {
-      uint16_t pixel = *pixels++;
-      buffer[(uint16_t)i * 2U] = (uint8_t)(pixel >> 8);
-      buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(pixel & 0xFFU);
-    }
+      uint16_t chunk = ((uint16_t)(width - sent) > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)(width - sent);
+      uint16_t i;
 
-    lcd_write_bytes(buffer, (uint16_t)(chunk * 2U));
-    remaining -= chunk;
+      for (i = 0U; i < chunk; i++)
+      {
+        uint16_t pixel = rowPixels[sent + i];
+        buffer[(uint16_t)i * 2U] = (uint8_t)(pixel >> 8);
+        buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(pixel & 0xFFU);
+      }
+
+      lcd_write_bytes(buffer, (uint16_t)(chunk * 2U));
+      sent = (uint16_t)(sent + chunk);
+    }
   }
 
   lcd_deselect();

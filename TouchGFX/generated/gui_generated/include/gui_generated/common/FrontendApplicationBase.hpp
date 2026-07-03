@@ -17,7 +17,7 @@ public:
 
     virtual void changeToStartScreen()
     {
-        gotoscreen1ScreenNoTransition();
+        gotoScreen2ScreenNoTransition();
     }
 
     // screen1

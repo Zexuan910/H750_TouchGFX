@@ -18,7 +18,7 @@ static bool cst816t_ready = false;
 
 static HAL_StatusTypeDef CST816T_ReadReg(uint8_t reg, uint8_t* data, uint16_t len)
 {
-  return HAL_I2C_Mem_Read(&hi2c1,
+  return HAL_I2C_Mem_Read(&hi2c3,
                           CST816T_I2C_ADDR,
                           reg,
                           I2C_MEMADD_SIZE_8BIT,
@@ -29,7 +29,7 @@ static HAL_StatusTypeDef CST816T_ReadReg(uint8_t reg, uint8_t* data, uint16_t le
 
 static HAL_StatusTypeDef CST816T_WriteReg(uint8_t reg, uint8_t data)
 {
-  return HAL_I2C_Mem_Write(&hi2c1,
+  return HAL_I2C_Mem_Write(&hi2c3,
                            CST816T_I2C_ADDR,
                            reg,
                            I2C_MEMADD_SIZE_8BIT,
@@ -72,6 +72,9 @@ void CST816T_Init(void)
   uint8_t dummy = 0U;
   cst816t_ready = false;
 
+  HAL_GPIO_WritePin(TRST_GPIO_Port, TRST_Pin, GPIO_PIN_RESET);
+  HAL_Delay(10U);
+  HAL_GPIO_WritePin(TRST_GPIO_Port, TRST_Pin, GPIO_PIN_SET);
   HAL_Delay(80U);
 
   /* 先探测芯片。部分 CST816T 的 chip id 可能读不出固定值，

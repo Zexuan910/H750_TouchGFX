@@ -4,7 +4,7 @@
 #include <images/BitmapDatabase.hpp>
 
 screen1View::screen1View()
-    : demoState(0)
+    : demoState(0), pressX(0), pressY(0)
 {
 
 }
@@ -30,12 +30,31 @@ void screen1View::handleClickEvent(const touchgfx::ClickEvent& evt)
 {
     screen1ViewBase::handleClickEvent(evt);
 
-    if (evt.getType() == touchgfx::ClickEvent::RELEASED)
+    if (evt.getType() == touchgfx::ClickEvent::PRESSED)
     {
-        if (isInTouchBox(evt.getX(), evt.getY()))
+        pressX = evt.getX();
+        pressY = evt.getY();
+    }
+    else if (evt.getType() == touchgfx::ClickEvent::RELEASED)
+    {
+        const int dx = evt.getX() - pressX;
+        const int dy = evt.getY() - pressY;
+        handleSwipe(dx, dy);
+
+        if (dx < 20 && dx > -20 && dy < 20 && dy > -20 && isInTouchBox(evt.getX(), evt.getY()))
         {
             nextDemoState();
         }
+    }
+}
+
+void screen1View::handleSwipe(int dx, int dy)
+{
+    const int SWIPE_THRESHOLD = 40;
+
+    if (dx > SWIPE_THRESHOLD && (dy < SWIPE_THRESHOLD && dy > -SWIPE_THRESHOLD))
+    {
+        application().gotoScreen2ScreenNoTransition();
     }
 }
 

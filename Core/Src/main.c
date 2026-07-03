@@ -9,14 +9,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "crc.h"
+#include "i2c.h"
 #include "quadspi.h"
 #include "spi.h"
 #include "tim.h"
 #include "gpio.h"
-#include "ui.h"
+#include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ui.h"
 
 /* USER CODE END Includes */
 
@@ -88,9 +90,10 @@ int main(void)
   MX_CRC_Init();
   MX_SPI1_Init();
   MX_TIM1_Init();
-#if !defined(APP_EXECUTES_FROM_QSPI) || (APP_EXECUTES_FROM_QSPI == 0)
+#ifndef APP_EXECUTES_FROM_QSPI
   MX_QUADSPI_Init();
 #endif
+  MX_I2C3_Init();
   UI_Init();
   /* USER CODE BEGIN 2 */
 
@@ -102,7 +105,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-  UI_Process();
+    UI_Process();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -173,7 +176,7 @@ void SystemClock_Config(void)
 
  /* MPU Configuration */
 
-static void MPU_Config(void)
+void MPU_Config(void)
 {
   MPU_Region_InitTypeDef MPU_InitStruct = {0};
 
@@ -196,6 +199,7 @@ static void MPU_Config(void)
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
+#ifdef APP_EXECUTES_FROM_QSPI
   MPU_InitStruct.Enable = MPU_REGION_ENABLE;
   MPU_InitStruct.Number = MPU_REGION_NUMBER1;
   MPU_InitStruct.BaseAddress = 0x90000000;
@@ -209,6 +213,7 @@ static void MPU_Config(void)
   MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
   HAL_MPU_ConfigRegion(&MPU_InitStruct);
+#endif
 
   /* Enables the MPU */
   HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);

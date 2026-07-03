@@ -54,6 +54,8 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_pressed.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_a.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_b.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_sport_bg.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/image_watch_bg.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/LanguageGb.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/Texts.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/texts/src/TypedTextDatabase.cpp

@@ -16,10 +16,13 @@ public:
 
 protected:
     int demoState;
+    int pressX;
+    int pressY;
 
     bool isInTouchBox(int x, int y) const;
     void nextDemoState();
     void updateDisplay();
+    void handleSwipe(int dx, int dy);
 };
 
 #endif // SCREEN1VIEW_HPP

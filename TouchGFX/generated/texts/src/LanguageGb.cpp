@@ -36,5 +36,6 @@ KEEP extern const uint32_t indicesGb[] TEXT_LOCATION_FLASH_ATTRIBUTE = {
     48,  // T___SINGLEUSE_YBPW: "New Text"
     48,  // T___SINGLEUSE_S7VM: "New Text"
     78,  // T___SINGLEUSE_06WV: "???"
-    0    // T_T_TITLE: "Hello TouchGFX"
+    0,   // T_T_TITLE: "Hello TouchGFX"
+    138  // T_T_WILDCARD_CENTER: "<value>"
 };
