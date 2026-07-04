@@ -1,6 +1,6 @@
 
 # Location of the TouchGFX framework used by Designer asset tools
-touchgfx_path := ../Middlewares/ST/touchgfx
+touchgfx_path := ../../../../TouchGFX/4.26.1/touchgfx
 
 # Location of the TouchGFX Environment
 touchgfx_env := ../../../../TouchGFX/4.26.1/env

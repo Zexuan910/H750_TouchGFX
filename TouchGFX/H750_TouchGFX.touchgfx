@@ -240,7 +240,7 @@
     "SelectedColorDepth": 16,
     "StartupScreenName": "home",
     "SelectedStartupLanguage": "GB",
-    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "TouchGfxPath": "D:/TouchGFX/4.26.1/touchgfx",
     "UIPath": ".",
     "AvailableColorDepths": [
       16
@@ -267,7 +267,7 @@
     },
     "GenerateAssetsCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/bin/make.exe -f simulator/gcc/Makefile assets -j8",
     "PostGenerateCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/Ruby30-x64/bin/ruby.exe D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/Ruby30-x64/bin/touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
-    "PostGenerateTargetCommand": "touchgfx update_project",
+    "PostGenerateTargetCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/bin/true.exe",
     "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
     "RunSimulatorCommand": "build\\bin\\simulator.exe",
     "LandscapeSkinX": 0,
@@ -280,7 +280,7 @@
     "Toolchain": "CMake",
     "Platform": "m7",
     "ProjectFile": "../H750_TouchGFX.ioc",
-    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponentsRoot": "D:/TouchGFX/4.26.1/touchgfx_components",
     "OptionalComponents": [],
     "AdditionalFeatures": []
   },

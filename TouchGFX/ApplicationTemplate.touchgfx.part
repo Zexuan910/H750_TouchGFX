@@ -2,7 +2,7 @@
 {
   "Application": {
     "Name": "H750_TouchGFX",
-    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "TouchGfxPath": "D:/TouchGFX/4.26.1/touchgfx",
     "AvailableColorDepths": [ 16 ],
     "AvailableLCDs":
     {
@@ -14,13 +14,13 @@
         "Height": 280
       }
     ],
-    "PostGenerateTargetCommand": "touchgfx update_project",
+    "PostGenerateTargetCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/bin/true.exe",
     "Family": "STM32H7",
     "SubFamily": "STM32H750 Value line",
     "Platform": "m7",
     "Toolchain": "CMake",
     "ProjectFile": "../H750_TouchGFX.ioc",
-    "OptionalComponentsRoot": "../Middlewares/ST/touchgfx_components",
+    "OptionalComponentsRoot": "D:/TouchGFX/4.26.1/touchgfx_components",
     "OptionalComponents": [
     ],
     "AdditionalFeatures": [
