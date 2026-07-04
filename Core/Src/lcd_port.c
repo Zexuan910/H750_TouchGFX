@@ -5,9 +5,17 @@
 #include "tim.h"
 
 #include <stddef.h>
+#include <string.h>
 
 #define LCD_SPI_TIMEOUT_MS 1000U
-#define LCD_TX_PIXELS      128U
+#define LCD_TX_PIXELS      240U
+#define LCD_TX_BYTES       (LCD_TX_PIXELS * 2U)
+#define LCD_USE_SPI_DMA    0U
+#define LCD_DMA_MIN_BYTES  32U
+
+__attribute__((section("LCD_DMA_Buffer"), aligned(32))) static uint8_t lcd_dma_tx_buffer[LCD_TX_BYTES];
+static volatile uint8_t lcd_spi_dma_done = 1U;
+static volatile uint8_t lcd_spi_dma_error = 0U;
 
 static void lcd_select(void)
 {
@@ -31,9 +39,62 @@ static void lcd_data_mode(void)
 
 static void lcd_write_bytes(const uint8_t* data, uint16_t size)
 {
-  if (size > 0U)
+  if ((data == NULL) || (size == 0U))
+  {
+    return;
+  }
+
+#if LCD_USE_SPI_DMA
+  if ((size < LCD_DMA_MIN_BYTES) || (size > LCD_TX_BYTES))
   {
     (void)HAL_SPI_Transmit(&hspi1, (uint8_t*)data, size, LCD_SPI_TIMEOUT_MS);
+    return;
+  }
+
+  if (data != lcd_dma_tx_buffer)
+  {
+    memcpy(lcd_dma_tx_buffer, data, size);
+  }
+
+  SCB_CleanDCache_by_Addr((uint32_t*)lcd_dma_tx_buffer, (int32_t)((size + 31U) & ~31U));
+
+  lcd_spi_dma_done = 0U;
+  lcd_spi_dma_error = 0U;
+  if (HAL_SPI_Transmit_DMA(&hspi1, lcd_dma_tx_buffer, size) != HAL_OK)
+  {
+    (void)HAL_SPI_Transmit(&hspi1, lcd_dma_tx_buffer, size, LCD_SPI_TIMEOUT_MS);
+    return;
+  }
+
+  const uint32_t startTick = HAL_GetTick();
+  while ((lcd_spi_dma_done == 0U) && (lcd_spi_dma_error == 0U))
+  {
+    if ((HAL_GetTick() - startTick) > LCD_SPI_TIMEOUT_MS)
+    {
+      (void)HAL_SPI_Abort(&hspi1);
+      lcd_spi_dma_error = 1U;
+      break;
+    }
+  }
+#else
+  (void)HAL_SPI_Transmit(&hspi1, (uint8_t*)data, size, LCD_SPI_TIMEOUT_MS);
+#endif
+}
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef* hspi)
+{
+  if (hspi->Instance == SPI1)
+  {
+    lcd_spi_dma_done = 1U;
+  }
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef* hspi)
+{
+  if (hspi->Instance == SPI1)
+  {
+    lcd_spi_dma_error = 1U;
+    lcd_spi_dma_done = 1U;
   }
 }
 
@@ -287,7 +348,7 @@ void LCD_ClearRGB565(uint16_t color)
 void LCD_FillRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color)
 {
   uint32_t remaining;
-  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  uint8_t* buffer = lcd_dma_tx_buffer;
   uint16_t i;
 
   if ((x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
@@ -342,7 +403,7 @@ void LCD_WriteRectRGB565Strided(uint16_t x,
                                 const uint16_t* pixels,
                                 uint16_t stridePixels)
 {
-  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  uint8_t* buffer = lcd_dma_tx_buffer;
   uint16_t row;
 
   if ((pixels == NULL) || (stridePixels < width) || (x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
@@ -395,7 +456,7 @@ void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
                                               const uint16_t* framebuffer,
                                               uint16_t stridePixels)
 {
-  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  uint8_t* buffer = lcd_dma_tx_buffer;
   int16_t clippedX = x;
   int16_t clippedY = y;
   int16_t clippedWidth = width;

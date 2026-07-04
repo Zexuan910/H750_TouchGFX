@@ -13,11 +13,13 @@
 #include "quadspi.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 #include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "imu_sensor.h"
 #include "ui.h"
 
 /* USER CODE END Includes */
@@ -94,6 +96,9 @@ int main(void)
   MX_QUADSPI_Init();
 #endif
   MX_I2C3_Init();
+  MX_I2C4_Init();
+  MX_USART1_UART_Init();
+  IMU_Sensor_Init();
   UI_Init();
   /* USER CODE BEGIN 2 */
 
@@ -105,6 +110,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    IMU_Sensor_Process();
     UI_Process();
     /* USER CODE BEGIN 3 */
   }

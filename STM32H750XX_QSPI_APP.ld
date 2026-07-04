@@ -179,6 +179,14 @@ SECTIONS
     . = ALIGN(4);
   } >RAM
 
+  LCD_DMA_Buffer (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(LCD_DMA_Buffer)
+    *(.LCD_DMA_Buffer)
+    . = ALIGN(32);
+  } >RAM
+
   ._user_heap_stack (NOLOAD) :
   {
     . = ALIGN(8);
