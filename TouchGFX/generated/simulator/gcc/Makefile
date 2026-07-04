@@ -134,13 +134,8 @@ fontconvert_font_files := $(fontconvert_ttf_lower_files) \
 			  $(fontconvert_bdf_lower_files) \
 			  $(fontconvert_bdf_upper_files)
 
-excluded_source_files := gui/src/screen1_screen/% \
-                         gui/src/screen2_screen/% \
-                         gui/src/screen3_screen/% \
-                         gui/src/screen_screen/%
-
-source_files := $(filter-out $(excluded_source_files),$(call find, $(source_paths),*.cpp)) $(framework_files) $(ADDITIONAL_SOURCES)
-c_source_files := $(filter-out $(excluded_source_files),$(call find, $(source_paths),*.c))
+source_files := $(call find, $(source_paths),*.cpp) $(framework_files) $(ADDITIONAL_SOURCES)
+c_source_files := $(call find, $(source_paths),*.c)
 
 object_files := $(source_files:$(touchgfx_path)/%.cpp=$(object_output_path)/touchgfx/%.o) $(c_source_files:$(touchgfx_path)/%.c=$(object_output_path)/touchgfx/%.o)
 object_files := $(object_files:%.cpp=$(object_output_path)/%.o)

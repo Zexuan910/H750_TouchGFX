@@ -20,10 +20,7 @@
     <ClCompile Include="..\..\gui\src\common\FrontendApplication.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\common\FrontendApplicationBase.cpp"/>
     <ClCompile Include="..\..\gui\src\model\Model.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen2_screen\Screen2View.cpp"/>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen3_screen\Screen3View.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen1_screen\screen1View.cpp"/>
     <ClCompile Include="..\..\gui\src\home_screen\homePresenter.cpp"/>
     <ClCompile Include="..\..\gui\src\home_screen\homeView.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\home_screen\homeViewBase.cpp"/>
@@ -31,7 +28,6 @@
     <ClCompile Include="..\..\gui\src\lock_screen\lockPresenter.cpp"/>
     <ClCompile Include="..\..\gui\src\lock_screen\lockView.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\lock_screen\lockViewBase.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml"/>
@@ -180,11 +176,8 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\MJPEGDecoder.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\Model.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\ModelListener.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen2_screen\Screen2View.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\common\SimConstants.hpp"/>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen3_screen\Screen3View.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen1_screen\screen1View.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\home_screen\homePresenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\home_screen\homeView.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\home_screen\homeViewBase.hpp"/>
