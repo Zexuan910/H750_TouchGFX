@@ -2,7 +2,6 @@
 #define FRONTENDAPPLICATION_HPP
 
 #include <gui_generated/common/FrontendApplicationBase.hpp>
-#include <touchgfx/Callback.hpp>
 
 class FrontendHeap;
 
@@ -14,20 +13,17 @@ public:
     FrontendApplication(Model& m, FrontendHeap& heap);
     virtual ~FrontendApplication() { }
 
+    void gotolockScreenNoTransition();
+
     virtual void handleTickEvent()
     {
         model.tick();
         FrontendApplicationBase::handleTickEvent();
     }
-
-    // 手动补充：Screen2 左滑时跳转到 Screen3
-    void gotoScreen3ScreenNoTransition();
-
 private:
-    // 手动补充：Screen3 跳转的真正实现函数
-    void gotoScreen3ScreenNoTransitionImpl();
+    touchgfx::Callback<FrontendApplication> lockTransitionCallback;
 
-    touchgfx::Callback<FrontendApplication> screen3TransitionCallback;
+    void gotolockScreenNoTransitionImpl();
 };
 
 #endif // FRONTENDAPPLICATION_HPP

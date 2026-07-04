@@ -1,6 +1,8 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
+#include <stdint.h>
+
 class ModelListener;
 
 class Model
@@ -16,6 +18,7 @@ public:
     void tick();
 protected:
     ModelListener* modelListener;
+    uint32_t tickCounter;
 };
 
 #endif // MODEL_HPP

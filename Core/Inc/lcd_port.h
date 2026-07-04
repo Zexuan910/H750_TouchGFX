@@ -31,6 +31,12 @@ void LCD_WriteRectRGB565Strided(uint16_t x,
                                 uint16_t height,
                                 const uint16_t* pixels,
                                 uint16_t stridePixels);
+void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
+                                              int16_t y,
+                                              int16_t width,
+                                              int16_t height,
+                                              const uint16_t* framebuffer,
+                                              uint16_t stridePixels);
 void LCD_DrawCenteredText(const char* text, uint16_t color, uint16_t bg_color, uint8_t scale);
 
 #ifdef __cplusplus

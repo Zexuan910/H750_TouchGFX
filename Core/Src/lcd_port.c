@@ -388,6 +388,110 @@ void LCD_WriteRectRGB565Strided(uint16_t x,
   lcd_deselect();
 }
 
+void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
+                                              int16_t y,
+                                              int16_t width,
+                                              int16_t height,
+                                              const uint16_t* framebuffer,
+                                              uint16_t stridePixels)
+{
+  uint8_t buffer[LCD_TX_PIXELS * 2U];
+  int16_t clippedX = x;
+  int16_t clippedY = y;
+  int16_t clippedWidth = width;
+  int16_t clippedHeight = height;
+  uint16_t physicalX;
+  uint16_t physicalY;
+  uint16_t physicalWidth;
+  uint16_t physicalHeight;
+  uint16_t row;
+  uint8_t framebufferIsLogicalLandscape;
+
+  if ((framebuffer == NULL) || (width <= 0) || (height <= 0) || (stridePixels < LCD_PORT_WIDTH))
+  {
+    return;
+  }
+
+  framebufferIsLogicalLandscape = (stridePixels >= LCD_PORT_HEIGHT) ? 1U : 0U;
+
+  if (clippedX < 0)
+  {
+    clippedWidth = (int16_t)(clippedWidth + clippedX);
+    clippedX = 0;
+  }
+  if (clippedY < 0)
+  {
+    clippedHeight = (int16_t)(clippedHeight + clippedY);
+    clippedY = 0;
+  }
+  if ((clippedX >= (int16_t)LCD_PORT_HEIGHT) || (clippedY >= (int16_t)LCD_PORT_WIDTH))
+  {
+    return;
+  }
+  if ((clippedX + clippedWidth) > (int16_t)LCD_PORT_HEIGHT)
+  {
+    clippedWidth = (int16_t)((int16_t)LCD_PORT_HEIGHT - clippedX);
+  }
+  if ((clippedY + clippedHeight) > (int16_t)LCD_PORT_WIDTH)
+  {
+    clippedHeight = (int16_t)((int16_t)LCD_PORT_WIDTH - clippedY);
+  }
+  if ((clippedWidth <= 0) || (clippedHeight <= 0))
+  {
+    return;
+  }
+
+  physicalX = (uint16_t)(LCD_PORT_WIDTH - (uint16_t)(clippedY + clippedHeight));
+  physicalY = (uint16_t)clippedX;
+  physicalWidth = (uint16_t)clippedHeight;
+  physicalHeight = (uint16_t)clippedWidth;
+
+  lcd_select();
+  lcd_set_window(physicalX,
+                 physicalY,
+                 (uint16_t)(physicalX + physicalWidth - 1U),
+                 (uint16_t)(physicalY + physicalHeight - 1U));
+  lcd_data_mode();
+
+  for (row = 0U; row < physicalHeight; row++)
+  {
+    uint16_t sent = 0U;
+    uint16_t logicalX = (uint16_t)(clippedX + (int16_t)row);
+
+    while (sent < physicalWidth)
+    {
+      uint16_t chunk = ((uint16_t)(physicalWidth - sent) > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)(physicalWidth - sent);
+      uint16_t i;
+
+      for (i = 0U; i < chunk; i++)
+      {
+        uint16_t physicalPixelX = (uint16_t)(physicalX + sent + i);
+        uint16_t logicalY = (uint16_t)(LCD_PORT_WIDTH - 1U - physicalPixelX);
+        uint16_t pixel;
+
+        if (framebufferIsLogicalLandscape != 0U)
+        {
+          pixel = framebuffer[(uint32_t)logicalY * stridePixels + logicalX];
+        }
+        else
+        {
+          uint16_t sourceX = logicalY;
+          uint16_t sourceY = (uint16_t)(LCD_PORT_HEIGHT - 1U - logicalX);
+          pixel = framebuffer[(uint32_t)sourceY * stridePixels + sourceX];
+        }
+
+        buffer[(uint16_t)i * 2U] = (uint8_t)(pixel >> 8);
+        buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(pixel & 0xFFU);
+      }
+
+      lcd_write_bytes(buffer, (uint16_t)(chunk * 2U));
+      sent = (uint16_t)(sent + chunk);
+    }
+  }
+
+  lcd_deselect();
+}
+
 void LCD_DrawCenteredText(const char* text, uint16_t color, uint16_t bg_color, uint8_t scale)
 {
   size_t len = 0U;

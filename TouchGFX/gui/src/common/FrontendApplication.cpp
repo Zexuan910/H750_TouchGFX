@@ -1,39 +1,25 @@
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/common/FrontendHeap.hpp>
-
-#include <gui/screen3_screen/Screen3View.hpp>
-#include <gui/screen3_screen/Screen3Presenter.hpp>
-
+#include <gui/lock_screen/lockView.hpp>
+#include <gui/lock_screen/lockPresenter.hpp>
 #include <touchgfx/transitions/NoTransition.hpp>
 
+using namespace touchgfx;
+
 FrontendApplication::FrontendApplication(Model& m, FrontendHeap& heap)
-    : FrontendApplicationBase(m, heap)
+    : FrontendApplicationBase(m, heap),
+      lockTransitionCallback()
 {
 
 }
 
-void FrontendApplication::gotoScreen3ScreenNoTransition()
+void FrontendApplication::gotolockScreenNoTransition()
 {
-    screen3TransitionCallback = touchgfx::Callback<FrontendApplication>(
-        this,
-        &FrontendApplication::gotoScreen3ScreenNoTransitionImpl
-    );
-
-    pendingScreenTransitionCallback = &screen3TransitionCallback;
+    lockTransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotolockScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &lockTransitionCallback;
 }
 
-void FrontendApplication::gotoScreen3ScreenNoTransitionImpl()
+void FrontendApplication::gotolockScreenNoTransitionImpl()
 {
-    touchgfx::makeTransition<
-        Screen3View,
-        Screen3Presenter,
-        touchgfx::NoTransition,
-        Model
-    >(
-        &currentScreen,
-        &currentPresenter,
-        frontendHeap,
-        &currentTransition,
-        &model
-    );
+    touchgfx::makeTransition<lockView, lockPresenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }

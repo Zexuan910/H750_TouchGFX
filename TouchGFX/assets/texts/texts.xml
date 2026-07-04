@@ -4,100 +4,30 @@
     <Language Id="GB" />
   </Languages>
   <Texts>
-    <TextGroup Id="Group1">
-      <Text Id="T_PAGE_1" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">第1页</Translation>
-      </Text>
-      <Text Id="T_PAGE_4" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">第4页</Translation>
-      </Text>
-      <Text Id="T_PAGE_3" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">第3页</Translation>
-      </Text>
-      <Text Id="T_PAGE_2" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">第2页</Translation>
-      </Text>
-      <Text Id="T_PAGE_5" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">第5页</Translation>
-      </Text>
-      <Text Id="T_RECT_1" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形1</Translation>
-      </Text>
-      <Text Id="T_RECT_10" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形10</Translation>
-      </Text>
-      <Text Id="T_RECT_9" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形9</Translation>
-      </Text>
-      <Text Id="T_RECT_8" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形8</Translation>
-      </Text>
-      <Text Id="T_RECT_7" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形7</Translation>
-      </Text>
-      <Text Id="T_RECT_6" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形6</Translation>
-      </Text>
-      <Text Id="T_RECT_5" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形5</Translation>
-      </Text>
-      <Text Id="T_RECT_4" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形4</Translation>
-      </Text>
-      <Text Id="T_RECT_3" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形3</Translation>
-      </Text>
-      <Text Id="T_RECT_2" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">矩形2</Translation>
-      </Text>
-      <Text Id="T_CN_3" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">嵌入式系统</Translation>
-      </Text>
-      <Text Id="T_CN_1" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">你好北航</Translation>
-      </Text>
-      <Text Id="T_CN_2" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">触摸切换</Translation>
-      </Text>
-      <Text Id="T_HELLO_UBAA" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB" Alignment="Center">hello ubaa</Translation>
-      </Text>
-      <Text Id="T_HELLO_BUAA" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB" Alignment="Center">hello buaa</Translation>
-      </Text>
-      <Text Id="T_HELLO_WORD" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">hello word</Translation>
-      </Text>
-    </TextGroup>
+    <TextGroup Id="Group1" />
     <TextGroup Id="Unsorted">
-      <Text Id="__SingleUse_IOQU" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
+      <Text Id="__SingleUse_F5GK" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">HELLO</Translation>
       </Text>
-      <Text Id="__SingleUse_GH4U" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
+      <Text Id="__SingleUse_F7Y7" Alignment="Center" TypographyId="Default">
+        <Translation Language="GB">OK</Translation>
       </Text>
-      <Text Id="__SingleUse_YBPW" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
+      <Text Id="TEAM_01" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">TEAM 01</Translation>
       </Text>
-      <Text Id="__SingleUse_S7VM" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
+      <Text Id="HOME_TIME" Alignment="Left" TypographyId="Large">
+        <Translation Language="GB">12:45</Translation>
       </Text>
-      <Text Id="__SingleUse_06WV" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">下一页</Translation>
+      <Text Id="HOME_DATE" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">2026-07-03</Translation>
       </Text>
-      <Text Id="T_TITLE" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">Hello TouchGFX</Translation>
-      </Text>
-      <Text Id="T_SPORT_GLYPHS" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">SPORT Choose mode WALK RUN ROPE Distance pace Speed heart Count rhythm HR 82 1.26 km 00:18 98% SpO2 Now Avg Step Cad Kcal Time</Translation>
-      </Text>
-      <Text Id="T_WILDCARD_CENTER" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">&lt;value&gt;</Translation>
+      <Text Id="HOME_WEEKDAY" Alignment="Left" TypographyId="Default">
+        <Translation Language="GB">FRIDAY</Translation>
       </Text>
     </TextGroup>
   </Texts>
   <Typographies>
-    <Typography Id="Default" Font="simsunb.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
+    <Typography Id="Default" Font="verdana.ttf" Size="20" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Large" Font="verdana.ttf" Size="40" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
     <Typography Id="Small" Font="verdana.ttf" Size="10" Bpp="4" IsVector="no" Direction="LTR" FallbackCharacter="?" />
   </Typographies>

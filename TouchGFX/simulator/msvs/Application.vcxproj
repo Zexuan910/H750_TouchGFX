@@ -20,16 +20,18 @@
     <ClCompile Include="..\..\gui\src\common\FrontendApplication.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\common\FrontendApplicationBase.cpp"/>
     <ClCompile Include="..\..\gui\src\model\Model.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen2_screen\Screen2Presenter.cpp"/>
     <ClCompile Include="..\..\gui\src\screen2_screen\Screen2View.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen2_screen\Screen2ViewBase.cpp"/>
     <ClCompile Include="..\..\generated\simulator\src\video\SoftwareMJPEGDecoder.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen3_screen\Screen3Presenter.cpp"/>
     <ClCompile Include="..\..\gui\src\screen3_screen\Screen3View.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen3_screen\Screen3ViewBase.cpp"/>
-    <ClCompile Include="..\..\gui\src\screen1_screen\screen1Presenter.cpp"/>
     <ClCompile Include="..\..\gui\src\screen1_screen\screen1View.cpp"/>
-    <ClCompile Include="..\..\generated\gui_generated\src\screen1_screen\screen1ViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\home_screen\homePresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\home_screen\homeView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\home_screen\homeViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\common\LockHomeState.cpp"/>
+    <ClCompile Include="..\..\gui\src\lock_screen\lockPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\lock_screen\lockView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\lock_screen\lockViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\screen_screen\screenView.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="$(ApplicationRoot)\assets\texts\texts.xml"/>
@@ -178,17 +180,22 @@
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\MJPEGDecoder.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\Model.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\model\ModelListener.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen2_screen\Screen2Presenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\screen2_screen\Screen2View.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen2_screen\Screen2ViewBase.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\common\SimConstants.hpp"/>
     <ClInclude Include="..\..\generated\simulator\include\simulator\video\SoftwareMJPEGDecoder.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen3_screen\Screen3Presenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\screen3_screen\Screen3View.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen3_screen\Screen3ViewBase.hpp"/>
-    <ClInclude Include="..\..\gui\include\gui\screen1_screen\screen1Presenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\screen1_screen\screen1View.hpp"/>
-    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\screen1_screen\screen1ViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\home_screen\homePresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\home_screen\homeView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\home_screen\homeViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\common\LockHomeState.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\lock_screen\lockPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\lock_screen\lockView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\lock_screen\lockViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\common\PixelText.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\watch\PixelText.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\common\SportMode.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\watch\WatchUiData.hpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(ApplicationRoot)\generated\simulator\touchgfx.rc"/>

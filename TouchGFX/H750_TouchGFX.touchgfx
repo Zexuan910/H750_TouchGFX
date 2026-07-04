@@ -2,224 +2,230 @@
   "Application": {
     "Screens": [
       {
-        "Name": "screen1",
+        "Name": "home",
         "Components": [
           {
             "Type": "Box",
-            "Name": "touchBox",
-            "X": 30,
-            "Y": 25,
-            "Width": 180,
-            "Height": 60,
+            "Name": "homeSkyTop",
+            "Width": 240,
+            "Height": 64,
             "Color": {
-              "Red": 64,
-              "Green": 64,
-              "Blue": 64
+              "Red": 72,
+              "Green": 171,
+              "Blue": 214
             }
-          },
-          {
-            "Type": "TextArea",
-            "Name": "touchText",
-            "X": 30,
-            "Y": 42,
-            "Width": 180,
-            "Height": 30,
-            "TextId": "T_CN_2",
-            "TextRotation": "0"
           },
           {
             "Type": "Box",
-            "Name": "displayBox",
-            "X": 30,
-            "Y": 115,
-            "Width": 180,
-            "Height": 130,
+            "Name": "homeSkyMiddle",
+            "Y": 64,
+            "Width": 240,
+            "Height": 64,
             "Color": {
-              "Red": 32,
-              "Green": 32,
-              "Blue": 32
+              "Red": 43,
+              "Green": 144,
+              "Blue": 196
             }
           },
-          {
-            "Type": "TextArea",
-            "Name": "displayText",
-            "X": 30,
-            "Y": 165,
-            "Width": 180,
-            "Height": 40,
-            "TextId": "__SingleUse_06WV",
-            "TextRotation": "0"
-          },
-          {
-            "Type": "Button",
-            "Name": "nextButton",
-            "X": 70,
-            "Y": 245,
-            "Width": 100,
-            "Height": 36,
-            "Pressed": "__generated\\alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_pressed.png",
-            "Released": "__generated\\alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_action.png",
-            "Preset": "alternate_theme\\presets\\button\\regular\\height_36\\tiny_rounded_action.json"
-          },
-          {
-            "Type": "Image",
-            "Name": "displayImage",
-            "X": 30,
-            "Y": 142,
-            "Width": 180,
-            "Height": 75,
-            "RelativeFilename": "b.png"
-          }
-        ],
-        "Interactions": [
-          {
-            "InteractionName": "Interaction1",
-            "Trigger": {
-              "Type": "TriggerClicked",
-              "TriggerComponent": "nextButton"
-            },
-            "Action": {
-              "Type": "ActionGotoScreen",
-              "ScreenTransitionType": "ScreenTransitionNone",
-              "ActionComponent": "Screen2"
-            }
-          }
-        ]
-      },
-      {
-        "Name": "Screen2",
-        "Components": [
           {
             "Type": "Box",
-            "Name": "rectBox1",
-            "X": 30,
-            "Y": 35,
-            "Width": 180,
-            "Height": 75,
+            "Name": "homeSkyLower",
+            "Y": 128,
+            "Width": 240,
+            "Height": 80,
+            "Color": {
+              "Red": 23,
+              "Green": 96,
+              "Blue": 145
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "homeFooter",
+            "Y": 208,
+            "Width": 240,
+            "Height": 72,
+            "Color": {
+              "Red": 16,
+              "Green": 55,
+              "Blue": 84
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "sunCore",
+            "X": 186,
+            "Y": 24,
+            "Width": 32,
+            "Height": 32,
             "Color": {
               "Red": 255,
-              "Green": 80,
-              "Blue": 80
+              "Green": 206,
+              "Blue": 72
             }
           },
           {
             "Type": "Box",
-            "Name": "rectBox2",
-            "X": 30,
-            "Y": 150,
-            "Width": 180,
-            "Height": 75,
+            "Name": "sunRayH",
+            "X": 178,
+            "Y": 32,
+            "Width": 48,
+            "Height": 16,
             "Color": {
-              "Red": 80,
-              "Green": 255,
-              "Blue": 80
+              "Red": 255,
+              "Green": 206,
+              "Blue": 72
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "sunRayV",
+            "X": 194,
+            "Y": 16,
+            "Width": 16,
+            "Height": 48,
+            "Color": {
+              "Red": 255,
+              "Green": 206,
+              "Blue": 72
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "cloudShadow",
+            "X": 132,
+            "Y": 144,
+            "Width": 66,
+            "Height": 20,
+            "Color": {
+              "Red": 176,
+              "Green": 214,
+              "Blue": 228
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "cloudBase",
+            "X": 122,
+            "Y": 138,
+            "Width": 84,
+            "Height": 22,
+            "Color": {
+              "Red": 231,
+              "Green": 244,
+              "Blue": 249
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "cloudLeft",
+            "X": 140,
+            "Y": 122,
+            "Width": 28,
+            "Height": 24,
+            "Color": {
+              "Red": 231,
+              "Green": 244,
+              "Blue": 249
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "cloudRight",
+            "X": 168,
+            "Y": 126,
+            "Width": 24,
+            "Height": 22,
+            "Color": {
+              "Red": 231,
+              "Green": 244,
+              "Blue": 249
             }
           },
           {
             "Type": "TextArea",
-            "Name": "rectText1",
-            "X": 30,
-            "Y": 60,
-            "Width": 180,
-            "Height": 30,
-            "TextId": "__SingleUse_S7VM",
-            "TextRotation": "0"
-          },
-          {
-            "Type": "TextArea",
-            "Name": "rectText2",
-            "X": 30,
-            "Y": 175,
-            "Width": 180,
-            "Height": 30,
-            "TextId": "__SingleUse_YBPW",
-            "TextRotation": "0"
-          },
-          {
-            "Type": "TextArea",
-            "Name": "pageText",
-            "Y": 250,
-            "Width": 240,
-            "Height": 25,
-            "TextId": "__SingleUse_GH4U",
+            "Name": "teamNameText",
+            "X": 18,
+            "Y": 18,
+            "Width": 120,
+            "Height": 20,
+            "TextId": "TEAM_01",
             "TextRotation": "0",
             "Color": {
-              "Red": 3,
-              "Green": 2,
-              "Blue": 2
+              "Red": 13,
+              "Green": 44,
+              "Blue": 65
             }
           },
           {
-            "Type": "Image",
-            "Name": "image1",
-            "X": -487,
-            "Y": -357,
+            "Type": "TextArea",
+            "Name": "timeText",
+            "X": 28,
+            "Y": 72,
             "Width": 180,
-            "Height": 75,
-            "RelativeFilename": "b.png"
+            "Height": 40,
+            "TextId": "HOME_TIME",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 248,
+              "Green": 252,
+              "Blue": 255
+            }
           },
           {
-            "Type": "Image",
-            "Name": "image2",
-            "X": 30,
-            "Y": 115,
+            "Type": "TextArea",
+            "Name": "dateText",
+            "X": 34,
+            "Y": 178,
             "Width": 180,
-            "Height": 75,
-            "RelativeFilename": "a.png"
+            "Height": 20,
+            "TextId": "HOME_DATE",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 220,
+              "Green": 238,
+              "Blue": 247
+            }
+          },
+          {
+            "Type": "TextArea",
+            "Name": "weekdayText",
+            "X": 70,
+            "Y": 222,
+            "Width": 120,
+            "Height": 20,
+            "TextId": "HOME_WEEKDAY",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 220,
+              "Green": 238,
+              "Blue": 247
+            }
+          },
+          {
+            "Type": "Box",
+            "Name": "time1_top",
+            "X": 28,
+            "Y": 128,
+            "Width": 34,
+            "Height": 4,
+            "Color": {
+              "Red": 248,
+              "Green": 252,
+              "Blue": 255
+            }
           }
         ],
         "Interactions": []
       },
       {
-        "Name": "Screen3",
-        "CanvasBufferSize": 3600,
+        "Name": "lock",
         "Components": [
           {
             "Type": "Box",
-            "Name": "backgroundBox",
+            "Name": "lockBackground",
             "Width": 240,
-            "Height": 280,
-            "Color": {
-              "Green": 16,
-              "Blue": 32
-            }
-          },
-          {
-            "Type": "Circle",
-            "Name": "circle1",
-            "X": 70,
-            "Y": 70,
-            "Width": 100,
-            "Height": 100,
-            "Color": {
-              "Green": 170,
-              "Blue": 255
-            },
-            "CenterX": 40.0,
-            "CenterY": 40.0,
-            "Radius": 40.0,
-            "EndAngle": 360.0,
-            "CapPrecision": "Butt"
-          },
-          {
-            "Type": "TextArea",
-            "Name": "circleText",
-            "Y": 190,
-            "Width": 240,
-            "Height": 30,
-            "TextId": "__SingleUse_IOQU",
-            "TextRotation": "0",
-            "Color": {
-              "Red": 255,
-              "Green": 255,
-              "Blue": 255
-            }
-          },
-          {
-            "Type": "Image",
-            "Name": "image1",
-            "Width": 80,
-            "Height": 80
+            "Height": 280
           }
         ],
         "Interactions": []
@@ -232,7 +238,7 @@
       "Height": 280
     },
     "SelectedColorDepth": 16,
-    "StartupScreenName": "Screen2",
+    "StartupScreenName": "home",
     "SelectedStartupLanguage": "GB",
     "TouchGfxPath": "../Middlewares/ST/touchgfx",
     "UIPath": ".",
@@ -259,8 +265,8 @@
         "IsEnabled": false
       }
     },
-    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
-    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "GenerateAssetsCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/bin/make.exe -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/Ruby30-x64/bin/ruby.exe D:/TouchGFX/4.26.1/env/MinGW/msys/1.0/Ruby30-x64/bin/touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
     "PostGenerateTargetCommand": "touchgfx update_project",
     "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
     "RunSimulatorCommand": "build\\bin\\simulator.exe",
