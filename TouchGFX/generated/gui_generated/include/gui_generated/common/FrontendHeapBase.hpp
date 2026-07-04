@@ -16,6 +16,12 @@
 #include <gui/home_screen/homePresenter.hpp>
 #include <gui/lock_screen/lockView.hpp>
 #include <gui/lock_screen/lockPresenter.hpp>
+#include <gui/screen1_screen/screen1View.hpp>
+#include <gui/screen1_screen/screen1Presenter.hpp>
+#include <gui/screen2_screen/Screen2View.hpp>
+#include <gui/screen2_screen/Screen2Presenter.hpp>
+#include <gui/screen3_screen/Screen3View.hpp>
+#include <gui/screen3_screen/Screen3Presenter.hpp>
 
 
 /**
@@ -40,7 +46,13 @@ public:
      */
     typedef touchgfx::meta::TypeList< homeView,
             touchgfx::meta::TypeList< lockView,
+            touchgfx::meta::TypeList< screen1View,
+            touchgfx::meta::TypeList< Screen2View,
+            touchgfx::meta::TypeList< Screen3View,
             touchgfx::meta::Nil >
+            >
+            >
+            >
             > GeneratedViewTypes;
 
     /**
@@ -54,7 +66,13 @@ public:
      */
     typedef touchgfx::meta::TypeList< homePresenter,
             touchgfx::meta::TypeList< lockPresenter,
+            touchgfx::meta::TypeList< screen1Presenter,
+            touchgfx::meta::TypeList< Screen2Presenter,
+            touchgfx::meta::TypeList< Screen3Presenter,
             touchgfx::meta::Nil >
+            >
+            >
+            >
             > GeneratedPresenterTypes;
 
     /**
