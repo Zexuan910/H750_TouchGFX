@@ -26,6 +26,7 @@ protected:
     int pressY;
     bool detailBuilt;
     bool walkMetricsRunning;
+    bool pressInSportButton;
     uint32_t walkStartMs;
     uint32_t lastWalkSampleMs;
     uint32_t lastWalkDisplayMs;
@@ -40,6 +41,8 @@ protected:
     PixelText mainValueText;
     PixelText mainLabelText;
     PixelText counterText;
+    touchgfx::Box sportButtonBox;
+    PixelText sportButtonText;
     PixelText statValueText[5];
     PixelText statLabelText[5];
     WatchUi::WatchSnapshot lastSnapshot;
@@ -65,9 +68,13 @@ protected:
     void applyStaticText();
     void applyWatchSnapshot();
     void startWalkMetrics(uint32_t now);
+    void stopWalkMetrics();
     void updateWalkDuration(uint32_t now);
     void updateWalkMetrics(uint32_t now);
     void applyWalkMetricsOutput();
+    bool isInSportButton(int x, int y) const;
+    void toggleSportMode();
+    void setSportButtonLabel();
     void handleSwipe(int dx, int dy);
 };
 

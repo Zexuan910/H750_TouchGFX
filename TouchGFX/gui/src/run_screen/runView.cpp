@@ -1,12 +1,17 @@
 #include <gui/run_screen/runView.hpp>
 #include <cstdio>
 #include <images/BitmapDatabase.hpp>
+#include <stm32h7xx_hal.h>
 #include <touchgfx/Color.hpp>
 
 runView::runView()
     : pressX(0),
       pressY(0),
       detailBuilt(false),
+      sportRunning(false),
+      pressInSportButton(false),
+      sportStartMs(0),
+      displayedSportSeconds(0),
       lastSnapshot(WatchUi::sampleSnapshot(0U)),
       heartBuffer{0},
       spo2Buffer{0},
@@ -17,7 +22,8 @@ runView::runView()
       ledBuffer{0},
       addrBuffer{0},
       failBuffer{0},
-      counterBuffer{0}
+      counterBuffer{0},
+      timeBuffer{0}
 {
 }
 
@@ -26,6 +32,7 @@ void runView::setupScreen()
     runViewBase::setupScreen();
     setupSportDetail();
     applyStaticText();
+    setSportButtonLabel();
     applyWatchSnapshot();
 }
 
@@ -42,13 +49,27 @@ void runView::handleClickEvent(const touchgfx::ClickEvent& evt)
     {
         pressX = evt.getX();
         pressY = evt.getY();
+        pressInSportButton = isInSportButton(pressX, pressY);
     }
     else if (evt.getType() == touchgfx::ClickEvent::RELEASED)
     {
         const int dx = evt.getX() - pressX;
         const int dy = evt.getY() - pressY;
+        if (pressInSportButton && isInSportButton(evt.getX(), evt.getY()) && dx < 20 && dx > -20 && dy < 20 && dy > -20)
+        {
+            toggleSportMode();
+            pressInSportButton = false;
+            return;
+        }
+        pressInSportButton = false;
         handleSwipe(dx, dy);
     }
+}
+
+void runView::handleTickEvent()
+{
+    runViewBase::handleTickEvent();
+    updateSportDuration(HAL_GetTick());
 }
 
 void runView::updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot)
@@ -131,6 +152,14 @@ void runView::setupSportDetail()
         add(statLabelText[i]);
     }
 
+    sportButtonBox.setPosition(52, 248, 136, 28);
+    sportButtonBox.setAlpha(230);
+    add(sportButtonBox);
+
+    sportButtonText.setScale(2);
+    sportButtonText.setColor(touchgfx::Color::getColorFromRGB(5, 12, 18));
+    add(sportButtonText);
+
     detailBuilt = true;
 }
 
@@ -180,6 +209,87 @@ void runView::applyWatchSnapshot()
         heartText.setText(heartBuffer);
         statValueText[1].setText(spo2Buffer);
     }
+}
+
+void runView::startSportMode(uint32_t now)
+{
+    sportRunning = true;
+    sportStartMs = now;
+    displayedSportSeconds = 0U;
+    statValueText[0].setText("00:00");
+    setSportButtonLabel();
+}
+
+void runView::stopSportMode()
+{
+    if (!sportRunning)
+    {
+        return;
+    }
+
+    sportRunning = false;
+    setSportButtonLabel();
+}
+
+void runView::updateSportDuration(uint32_t now)
+{
+    if (!sportRunning)
+    {
+        return;
+    }
+
+    const uint32_t elapsedSeconds = (now - sportStartMs) / 1000U;
+    if (elapsedSeconds == displayedSportSeconds)
+    {
+        return;
+    }
+
+    displayedSportSeconds = elapsedSeconds;
+    const unsigned int minutes = static_cast<unsigned int>((elapsedSeconds / 60U) % 100U);
+    const unsigned int seconds = static_cast<unsigned int>(elapsedSeconds % 60U);
+    (void)std::snprintf(timeBuffer, sizeof(timeBuffer), "%02u:%02u", minutes, seconds);
+    statValueText[0].setText(timeBuffer);
+}
+
+bool runView::isInSportButton(int x, int y) const
+{
+    return x >= 52 && x < 188 && y >= 248 && y < 276;
+}
+
+void runView::toggleSportMode()
+{
+    if (sportRunning)
+    {
+        stopSportMode();
+    }
+    else
+    {
+        startSportMode(HAL_GetTick());
+    }
+}
+
+void runView::setSportButtonLabel()
+{
+    if (!detailBuilt)
+    {
+        return;
+    }
+
+    if (sportRunning)
+    {
+        sportButtonBox.setColor(touchgfx::Color::getColorFromRGB(255, 106, 61));
+        sportButtonText.setPosition(103, 255, 0, 0);
+        sportButtonText.setText("END");
+    }
+    else
+    {
+        sportButtonBox.setColor(touchgfx::Color::getColorFromRGB(63, 212, 122));
+        sportButtonText.setPosition(91, 255, 0, 0);
+        sportButtonText.setText("START");
+    }
+
+    sportButtonBox.invalidate();
+    sportButtonText.invalidate();
 }
 
 void runView::handleSwipe(int dx, int dy)

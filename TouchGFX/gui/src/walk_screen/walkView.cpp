@@ -15,6 +15,7 @@ walkView::walkView()
       pressY(0),
       detailBuilt(false),
       walkMetricsRunning(false),
+      pressInSportButton(false),
       walkStartMs(0),
       lastWalkSampleMs(0),
       lastWalkDisplayMs(0),
@@ -45,7 +46,7 @@ void walkView::setupScreen()
     walkViewBase::setupScreen();
     setupSportDetail();
     applyStaticText();
-    startWalkMetrics(HAL_GetTick());
+    setSportButtonLabel();
     applyWatchSnapshot();
 }
 
@@ -64,11 +65,19 @@ void walkView::handleClickEvent(const touchgfx::ClickEvent& evt)
     {
         pressX = evt.getX();
         pressY = evt.getY();
+        pressInSportButton = isInSportButton(pressX, pressY);
     }
     else if (evt.getType() == touchgfx::ClickEvent::RELEASED)
     {
         const int dx = evt.getX() - pressX;
         const int dy = evt.getY() - pressY;
+        if (pressInSportButton && isInSportButton(evt.getX(), evt.getY()) && dx < 20 && dx > -20 && dy < 20 && dy > -20)
+        {
+            toggleSportMode();
+            pressInSportButton = false;
+            return;
+        }
+        pressInSportButton = false;
         handleSwipe(dx, dy);
     }
 }
@@ -161,6 +170,14 @@ void walkView::setupSportDetail()
         statLabelText[i].setColor(touchgfx::Color::getColorFromRGB(142, 158, 178));
         add(statLabelText[i]);
     }
+
+    sportButtonBox.setPosition(52, 248, 136, 28);
+    sportButtonBox.setAlpha(230);
+    add(sportButtonBox);
+
+    sportButtonText.setScale(2);
+    sportButtonText.setColor(touchgfx::Color::getColorFromRGB(5, 12, 18));
+    add(sportButtonText);
 
     detailBuilt = true;
 }
@@ -312,6 +329,60 @@ void walkView::applyWalkMetricsOutput()
     statValueText[2].setText(nowSpeedBuffer);
     statValueText[3].setText(avgSpeedBuffer);
     statValueText[4].setText(stepBuffer);
+}
+
+void walkView::stopWalkMetrics()
+{
+    if (!walkMetricsRunning)
+    {
+        return;
+    }
+
+    WalkMetrics_Stop(&walkMetricsState);
+    walkMetricsRunning = false;
+    setSportButtonLabel();
+}
+
+bool walkView::isInSportButton(int x, int y) const
+{
+    return x >= 52 && x < 188 && y >= 248 && y < 276;
+}
+
+void walkView::toggleSportMode()
+{
+    if (walkMetricsRunning)
+    {
+        stopWalkMetrics();
+    }
+    else
+    {
+        startWalkMetrics(HAL_GetTick());
+        setSportButtonLabel();
+    }
+}
+
+void walkView::setSportButtonLabel()
+{
+    if (!detailBuilt)
+    {
+        return;
+    }
+
+    if (walkMetricsRunning)
+    {
+        sportButtonBox.setColor(touchgfx::Color::getColorFromRGB(255, 106, 61));
+        sportButtonText.setPosition(103, 255, 0, 0);
+        sportButtonText.setText("END");
+    }
+    else
+    {
+        sportButtonBox.setColor(touchgfx::Color::getColorFromRGB(63, 212, 122));
+        sportButtonText.setPosition(91, 255, 0, 0);
+        sportButtonText.setText("START");
+    }
+
+    sportButtonBox.invalidate();
+    sportButtonText.invalidate();
 }
 
 void walkView::handleSwipe(int dx, int dy)

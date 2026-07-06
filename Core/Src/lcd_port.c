@@ -8,10 +8,12 @@
 #include <string.h>
 
 #define LCD_SPI_TIMEOUT_MS 1000U
-#define LCD_TX_PIXELS      240U
+#define LCD_TX_ROWS        8U
+#define LCD_TX_PIXELS      (LCD_PORT_WIDTH * LCD_TX_ROWS)
 #define LCD_TX_BYTES       (LCD_TX_PIXELS * 2U)
 #define LCD_USE_SPI_DMA    0U
 #define LCD_DMA_MIN_BYTES  32U
+#define LCD_USE_P169H002_INIT 0U
 
 __attribute__((section("LCD_DMA_Buffer"), aligned(32))) static uint8_t lcd_dma_tx_buffer[LCD_TX_BYTES];
 static volatile uint8_t lcd_spi_dma_done = 1U;
@@ -150,7 +152,82 @@ static void lcd_set_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 
 static void lcd_write_init_sequence(void)
 {
-  /* Initialization sequence aligned with SCREEN_COLOR/Core/Src/LCD_1in69.c. */
+  /* Optional P169H002 sequence from the U575 SCREEN_COLOR reference. */
+#if LCD_USE_P169H002_INIT
+  lcd_write_command(0x11U);
+  HAL_Delay(120U);
+
+  lcd_write_command(0x36U);
+  lcd_write_data8(0x00U);
+
+  lcd_write_command(0x3AU);
+  lcd_write_data8(0x55U);
+
+  lcd_write_command(0xB2U);
+  lcd_write_data8(0x0CU);
+  lcd_write_data8(0x0CU);
+  lcd_write_data8(0x00U);
+  lcd_write_data8(0x33U);
+  lcd_write_data8(0x33U);
+
+  lcd_write_command(0xB7U);
+  lcd_write_data8(0x35U);
+
+  lcd_write_command(0xBBU);
+  lcd_write_data8(0x32U);
+
+  lcd_write_command(0xC2U);
+  lcd_write_data8(0x01U);
+
+  lcd_write_command(0xC3U);
+  lcd_write_data8(0x15U);
+
+  lcd_write_command(0xC4U);
+  lcd_write_data8(0x20U);
+
+  lcd_write_command(0xC6U);
+  lcd_write_data8(0x0FU);
+
+  lcd_write_command(0xD0U);
+  lcd_write_data8(0xA4U);
+  lcd_write_data8(0xA1U);
+
+  lcd_write_command(0xE0U);
+  lcd_write_data8(0xD0U);
+  lcd_write_data8(0x08U);
+  lcd_write_data8(0x0EU);
+  lcd_write_data8(0x09U);
+  lcd_write_data8(0x09U);
+  lcd_write_data8(0x05U);
+  lcd_write_data8(0x31U);
+  lcd_write_data8(0x33U);
+  lcd_write_data8(0x48U);
+  lcd_write_data8(0x17U);
+  lcd_write_data8(0x14U);
+  lcd_write_data8(0x15U);
+  lcd_write_data8(0x31U);
+  lcd_write_data8(0x34U);
+
+  lcd_write_command(0xE1U);
+  lcd_write_data8(0xD0U);
+  lcd_write_data8(0x08U);
+  lcd_write_data8(0x0EU);
+  lcd_write_data8(0x09U);
+  lcd_write_data8(0x09U);
+  lcd_write_data8(0x15U);
+  lcd_write_data8(0x31U);
+  lcd_write_data8(0x33U);
+  lcd_write_data8(0x48U);
+  lcd_write_data8(0x17U);
+  lcd_write_data8(0x14U);
+  lcd_write_data8(0x15U);
+  lcd_write_data8(0x31U);
+  lcd_write_data8(0x34U);
+
+  lcd_write_command(0x21U);
+  lcd_write_command(0x29U);
+  HAL_Delay(20U);
+#else
   lcd_write_command(0x36U);
   lcd_write_data8(0x00U);
 
@@ -236,6 +313,7 @@ static void lcd_write_init_sequence(void)
 
   lcd_write_command(0x29U);
   HAL_Delay(20U);
+#endif
 }
 
 static const uint8_t* lcd_glyph_for(char ch)
@@ -349,6 +427,7 @@ void LCD_FillRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
 {
   uint32_t remaining;
   uint8_t* buffer = lcd_dma_tx_buffer;
+  uint16_t fillPixels;
   uint16_t i;
 
   if ((x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
@@ -365,13 +444,14 @@ void LCD_FillRectRGB565(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
     height = (uint16_t)(LCD_PORT_HEIGHT - y);
   }
 
-  for (i = 0U; i < LCD_TX_PIXELS; i++)
+  remaining = (uint32_t)width * height;
+  fillPixels = (remaining > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)remaining;
+  for (i = 0U; i < fillPixels; i++)
   {
     buffer[(uint16_t)i * 2U] = (uint8_t)(color >> 8);
     buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(color & 0xFFU);
   }
 
-  remaining = (uint32_t)width * height;
   lcd_select();
   lcd_set_window(x, y, (uint16_t)(x + width - 1U), (uint16_t)(y + height - 1U));
   lcd_data_mode();
@@ -405,6 +485,7 @@ void LCD_WriteRectRGB565Strided(uint16_t x,
 {
   uint8_t* buffer = lcd_dma_tx_buffer;
   uint16_t row;
+  uint16_t rowsPerChunk;
 
   if ((pixels == NULL) || (stridePixels < width) || (x >= LCD_PORT_WIDTH) || (y >= LCD_PORT_HEIGHT) || (width == 0U) || (height == 0U))
   {
@@ -424,26 +505,38 @@ void LCD_WriteRectRGB565Strided(uint16_t x,
   lcd_set_window(x, y, (uint16_t)(x + width - 1U), (uint16_t)(y + height - 1U));
   lcd_data_mode();
 
-  for (row = 0U; row < height; row++)
+  rowsPerChunk = (uint16_t)(LCD_TX_PIXELS / width);
+  if (rowsPerChunk == 0U)
   {
-    const uint16_t* rowPixels = pixels + (uint32_t)row * stridePixels;
-    uint16_t sent = 0U;
+    rowsPerChunk = 1U;
+  }
 
-    while (sent < width)
+  for (row = 0U; row < height;)
+  {
+    uint16_t rowsThisChunk = (uint16_t)(height - row);
+    uint32_t out = 0U;
+    uint16_t packedRow;
+
+    if (rowsThisChunk > rowsPerChunk)
     {
-      uint16_t chunk = ((uint16_t)(width - sent) > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)(width - sent);
-      uint16_t i;
-
-      for (i = 0U; i < chunk; i++)
-      {
-        uint16_t pixel = rowPixels[sent + i];
-        buffer[(uint16_t)i * 2U] = (uint8_t)(pixel >> 8);
-        buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(pixel & 0xFFU);
-      }
-
-      lcd_write_bytes(buffer, (uint16_t)(chunk * 2U));
-      sent = (uint16_t)(sent + chunk);
+      rowsThisChunk = rowsPerChunk;
     }
+
+    for (packedRow = 0U; packedRow < rowsThisChunk; packedRow++)
+    {
+      const uint16_t* rowPixels = pixels + (uint32_t)(row + packedRow) * stridePixels;
+      uint16_t col;
+
+      for (col = 0U; col < width; col++)
+      {
+        uint16_t pixel = rowPixels[col];
+        buffer[out++] = (uint8_t)(pixel >> 8);
+        buffer[out++] = (uint8_t)(pixel & 0xFFU);
+      }
+    }
+
+    lcd_write_bytes(buffer, (uint16_t)out);
+    row = (uint16_t)(row + rowsThisChunk);
   }
 
   lcd_deselect();
@@ -506,6 +599,7 @@ void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
   physicalY = (uint16_t)clippedX;
   physicalWidth = (uint16_t)clippedHeight;
   physicalHeight = (uint16_t)clippedWidth;
+  row = 0U;
 
   lcd_select();
   lcd_set_window(physicalX,
@@ -514,19 +608,30 @@ void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
                  (uint16_t)(physicalY + physicalHeight - 1U));
   lcd_data_mode();
 
-  for (row = 0U; row < physicalHeight; row++)
+  while (row < physicalHeight)
   {
-    uint16_t sent = 0U;
-    uint16_t logicalX = (uint16_t)(clippedX + (int16_t)row);
+    uint16_t rowsPerChunk = (uint16_t)(LCD_TX_PIXELS / physicalWidth);
+    uint16_t rowsThisChunk = (uint16_t)(physicalHeight - row);
+    uint32_t out = 0U;
+    uint16_t packedRow;
 
-    while (sent < physicalWidth)
+    if (rowsPerChunk == 0U)
     {
-      uint16_t chunk = ((uint16_t)(physicalWidth - sent) > LCD_TX_PIXELS) ? LCD_TX_PIXELS : (uint16_t)(physicalWidth - sent);
+      rowsPerChunk = 1U;
+    }
+    if (rowsThisChunk > rowsPerChunk)
+    {
+      rowsThisChunk = rowsPerChunk;
+    }
+
+    for (packedRow = 0U; packedRow < rowsThisChunk; packedRow++)
+    {
+      uint16_t logicalX = (uint16_t)(clippedX + (int16_t)(row + packedRow));
       uint16_t i;
 
-      for (i = 0U; i < chunk; i++)
+      for (i = 0U; i < physicalWidth; i++)
       {
-        uint16_t physicalPixelX = (uint16_t)(physicalX + sent + i);
+        uint16_t physicalPixelX = (uint16_t)(physicalX + i);
         uint16_t logicalY = (uint16_t)(LCD_PORT_WIDTH - 1U - physicalPixelX);
         uint16_t pixel;
 
@@ -541,13 +646,13 @@ void LCD_WriteLandscapeRGB565StridedClockwise(int16_t x,
           pixel = framebuffer[(uint32_t)sourceY * stridePixels + sourceX];
         }
 
-        buffer[(uint16_t)i * 2U] = (uint8_t)(pixel >> 8);
-        buffer[(uint16_t)i * 2U + 1U] = (uint8_t)(pixel & 0xFFU);
+        buffer[out++] = (uint8_t)(pixel >> 8);
+        buffer[out++] = (uint8_t)(pixel & 0xFFU);
       }
-
-      lcd_write_bytes(buffer, (uint16_t)(chunk * 2U));
-      sent = (uint16_t)(sent + chunk);
     }
+
+    lcd_write_bytes(buffer, (uint16_t)out);
+    row = (uint16_t)(row + rowsThisChunk);
   }
 
   lcd_deselect();

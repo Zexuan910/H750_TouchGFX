@@ -13,20 +13,42 @@ class PixelText : public touchgfx::Widget
 {
 public:
     PixelText()
-        : text(""), color(touchgfx::Color::getColorFromRGB(255, 255, 255)), scale(2)
+        : text{0}, color(touchgfx::Color::getColorFromRGB(255, 255, 255)), scale(2), textLength(0)
     {
     }
 
     void setText(const char* newText)
     {
+        const char* value = newText ? newText : "";
+        char clippedText[kMaxTextLength + 1U];
+        uint16_t length = 0U;
+
+        while ((value[length] != '\0') && (length < kMaxTextLength))
+        {
+            clippedText[length] = value[length];
+            ++length;
+        }
+        clippedText[length] = '\0';
+
+        if ((length == textLength) && (std::memcmp(text, clippedText, static_cast<size_t>(length) + 1U) == 0))
+        {
+            return;
+        }
+
         invalidate();
-        text = newText ? newText : "";
+        std::memcpy(text, clippedText, static_cast<size_t>(length) + 1U);
+        textLength = length;
         updateSize();
         invalidate();
     }
 
     void setColor(touchgfx::colortype newColor)
     {
+        if (color == newColor)
+        {
+            return;
+        }
+
         invalidate();
         color = newColor;
         invalidate();
@@ -34,8 +56,14 @@ public:
 
     void setScale(uint8_t newScale)
     {
+        const uint8_t normalizedScale = newScale ? newScale : 1;
+        if (scale == normalizedScale)
+        {
+            return;
+        }
+
         invalidate();
-        scale = newScale ? newScale : 1;
+        scale = normalizedScale;
         updateSize();
         invalidate();
     }
@@ -78,14 +106,15 @@ public:
     }
 
 private:
-    const char* text;
+    static const uint16_t kMaxTextLength = 63U;
+    char text[kMaxTextLength + 1U];
     touchgfx::colortype color;
     uint8_t scale;
+    uint16_t textLength;
 
     void updateSize()
     {
-        const uint16_t length = static_cast<uint16_t>(std::strlen(text));
-        setWidth(length ? static_cast<uint16_t>((length * 6 - 1) * scale) : 0);
+        setWidth(textLength ? static_cast<uint16_t>((textLength * 6 - 1) * scale) : 0);
         setHeight(static_cast<uint16_t>(7 * scale));
     }
 

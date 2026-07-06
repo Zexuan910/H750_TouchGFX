@@ -17,12 +17,17 @@ public:
     virtual void setupScreen();
     virtual void tearDownScreen();
     virtual void handleClickEvent(const touchgfx::ClickEvent& evt);
+    virtual void handleTickEvent();
     void updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot);
 
 protected:
     int pressX;
     int pressY;
     bool detailBuilt;
+    bool sportRunning;
+    bool pressInSportButton;
+    uint32_t sportStartMs;
+    uint32_t displayedSportSeconds;
 
     touchgfx::Image backgroundImage;
     touchgfx::Box dimOverlay;
@@ -33,6 +38,8 @@ protected:
     PixelText mainValueText;
     PixelText mainLabelText;
     PixelText counterText;
+    touchgfx::Box sportButtonBox;
+    PixelText sportButtonText;
     PixelText statValueText[5];
     PixelText statLabelText[5];
     WatchUi::WatchSnapshot lastSnapshot;
@@ -46,10 +53,17 @@ protected:
     char addrBuffer[24];
     char failBuffer[16];
     char counterBuffer[40];
+    char timeBuffer[9];
 
     void setupSportDetail();
     void applyStaticText();
     void applyWatchSnapshot();
+    void startSportMode(uint32_t now);
+    void stopSportMode();
+    void updateSportDuration(uint32_t now);
+    bool isInSportButton(int x, int y) const;
+    void toggleSportMode();
+    void setSportButtonLabel();
     void handleSwipe(int dx, int dy);
 };
 
