@@ -64,6 +64,9 @@ target_sources(${APP_TARGET} PRIVATE
     Core/Src/lcd_port.c
     Core/Src/max30102.c
     Core/Src/max30102_service.c
+    Core/Src/imu_sensor.c
+    Core/Src/walk_metrics.c
+    Core/Src/usart.c
 )
 
 if(ENABLE_CST816T_TOUCH)

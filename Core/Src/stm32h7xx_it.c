@@ -22,6 +22,9 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#ifndef BOOTLOADER_BUILD
+#include "usart.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +60,9 @@
 /* External variables --------------------------------------------------------*/
 
 /* USER CODE BEGIN EV */
+#ifndef BOOTLOADER_BUILD
+extern DMA_HandleTypeDef hdma_spi1_tx;
+#endif
 
 /* USER CODE END EV */
 
@@ -199,5 +205,19 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
+
+void DMA1_Stream0_IRQHandler(void)
+{
+#ifndef BOOTLOADER_BUILD
+  HAL_DMA_IRQHandler(&hdma_spi1_tx);
+#endif
+}
+
+void USART1_IRQHandler(void)
+{
+#ifndef BOOTLOADER_BUILD
+  USART1_Wireless_IRQHandler();
+#endif
+}
 
 /* USER CODE END 1 */

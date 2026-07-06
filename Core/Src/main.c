@@ -13,11 +13,13 @@
 #include "quadspi.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 #include "app_touchgfx.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "imu_sensor.h"
 #include "ui.h"
 #include "max30102_service.h"
 
@@ -97,6 +99,8 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C3_Init();
   MX_I2C2_Init();
+  MX_USART1_UART_Init();
+  IMU_Sensor_Init();
   UI_Init();
   /* USER CODE BEGIN 2 */
   (void)Max30102Service_Init();
@@ -109,6 +113,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    IMU_Sensor_Process();
     UI_Process();
     /* USER CODE BEGIN 3 */
     Max30102Service_Poll(HAL_GetTick());

@@ -94,6 +94,18 @@ function Assert-TextContains {
     }
 }
 
+function Assert-TextNotContains {
+    param(
+        [string]$Path,
+        [string]$Unexpected
+    )
+
+    $text = Get-Content -LiteralPath $Path -Raw
+    if ($text.Contains($Unexpected)) {
+        throw "Unexpected text in $([System.IO.Path]::GetFileName($Path)): $Unexpected"
+    }
+}
+
 Assert-File $IocPath "Missing CubeMX project"
 Assert-File $MainHeaderPath "Missing main.h"
 Assert-File $ReadmePath "Missing flash download notes"
@@ -156,6 +168,10 @@ foreach ($physicalPin in $max30102I2cPins) {
         throw "MAX30102 I2C1 pin $physicalPin conflicts with LCD pin $($lcdPhysicalPins[$physicalPin])."
     }
 }
+
+Assert-TextNotContains $IocPath "PB8.Signal=I2C4_SCL"
+Assert-TextNotContains $IocPath "PB9.Signal=I2C4_SDA"
+Assert-TextNotContains $IocPath "Mcu.IP11=I2C4"
 
 Assert-TextContains $ReadmePath "QSPI wiring: PB2=CLK, PB6=NCS, PF8=IO0, PF9=IO1, PF7=IO2, PF6=IO3."
 Assert-TextContains $AgentsPath '`PF8`：QSPI_BK1_IO0'

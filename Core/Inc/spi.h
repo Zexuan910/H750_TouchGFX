@@ -38,6 +38,8 @@ extern SPI_HandleTypeDef hspi1;
 
 /* USER CODE END Private defines */
 
+extern DMA_HandleTypeDef hdma_spi1_tx;
+
 void MX_SPI1_Init(void);
 
 /* USER CODE BEGIN Prototypes */

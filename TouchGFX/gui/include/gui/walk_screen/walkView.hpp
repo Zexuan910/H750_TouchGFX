@@ -7,6 +7,7 @@
 #include <touchgfx/events/ClickEvent.hpp>
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/Image.hpp>
+#include "walk_metrics.h"
 
 class walkView : public walkViewBase
 {
@@ -17,12 +18,18 @@ public:
     virtual void setupScreen();
     virtual void tearDownScreen();
     virtual void handleClickEvent(const touchgfx::ClickEvent& evt);
+    virtual void handleTickEvent();
     void updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot);
 
 protected:
     int pressX;
     int pressY;
     bool detailBuilt;
+    bool walkMetricsRunning;
+    uint32_t walkStartMs;
+    uint32_t lastWalkSampleMs;
+    uint32_t lastWalkDisplayMs;
+    uint32_t displayedWalkSeconds;
 
     touchgfx::Image backgroundImage;
     touchgfx::Box dimOverlay;
@@ -46,10 +53,21 @@ protected:
     char addrBuffer[24];
     char failBuffer[16];
     char counterBuffer[40];
+    char timeBuffer[9];
+    char distanceBuffer[12];
+    char nowSpeedBuffer[12];
+    char avgSpeedBuffer[12];
+    char stepBuffer[12];
+    WalkMetricsState walkMetricsState;
+    WalkMetricsOutput walkMetricsOutput;
 
     void setupSportDetail();
     void applyStaticText();
     void applyWatchSnapshot();
+    void startWalkMetrics(uint32_t now);
+    void updateWalkDuration(uint32_t now);
+    void updateWalkMetrics(uint32_t now);
+    void applyWalkMetricsOutput();
     void handleSwipe(int dx, int dy);
 };
 
