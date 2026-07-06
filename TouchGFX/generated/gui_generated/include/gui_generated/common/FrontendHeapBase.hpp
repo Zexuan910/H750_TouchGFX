@@ -12,98 +12,60 @@
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
 
-#include <gui/home_screen/homeView.hpp>
 #include <gui/home_screen/homePresenter.hpp>
-#include <gui/lock_screen/lockView.hpp>
+#include <gui/home_screen/homeView.hpp>
 #include <gui/lock_screen/lockPresenter.hpp>
-#include <gui/screen1_screen/screen1View.hpp>
+#include <gui/lock_screen/lockView.hpp>
+#include <gui/rope_screen/ropePresenter.hpp>
+#include <gui/rope_screen/ropeView.hpp>
+#include <gui/run_screen/runPresenter.hpp>
+#include <gui/run_screen/runView.hpp>
 #include <gui/screen1_screen/screen1Presenter.hpp>
-#include <gui/screen2_screen/Screen2View.hpp>
-#include <gui/screen2_screen/Screen2Presenter.hpp>
-#include <gui/screen3_screen/Screen3View.hpp>
-#include <gui/screen3_screen/Screen3Presenter.hpp>
+#include <gui/screen1_screen/screen1View.hpp>
+#include <gui/walk_screen/walkPresenter.hpp>
+#include <gui/walk_screen/walkView.hpp>
 
-
-/**
- * This class provides the memory that shall be used for memory allocations
- * in the frontend. A single instance of the FrontendHeap is allocated once (in heap
- * memory), and all other frontend objects such as views, presenters and data model are
- * allocated within the scope of this FrontendHeap. As such, the RAM usage of the entire
- * user interface is sizeof(FrontendHeap).
- *
- * @note The FrontendHeap reserves memory for the most memory-consuming presenter and
- * view only. The largest of these classes are determined at compile-time using template
- * magic. As such, it is important to add all presenters, views and transitions to the
- * type lists in this class.
- *
- */
 class FrontendHeapBase : public touchgfx::MVPHeap
 {
 public:
-    /**
-     * A list of all view types. Must end with meta::Nil.
-     * @note All view types used in the application MUST be added to this list!
-     */
     typedef touchgfx::meta::TypeList< homeView,
             touchgfx::meta::TypeList< lockView,
             touchgfx::meta::TypeList< screen1View,
-            touchgfx::meta::TypeList< Screen2View,
-            touchgfx::meta::TypeList< Screen3View,
+            touchgfx::meta::TypeList< walkView,
+            touchgfx::meta::TypeList< runView,
+            touchgfx::meta::TypeList< ropeView,
             touchgfx::meta::Nil >
-            >
-            >
-            >
-            > GeneratedViewTypes;
+            > > > > > GeneratedViewTypes;
 
-    /**
-     * Determine (compile time) the View type of largest size.
-     */
     typedef touchgfx::meta::select_type_maxsize< GeneratedViewTypes >::type MaxGeneratedViewType;
 
-    /**
-     * A list of all presenter types. Must end with meta::Nil.
-     * @note All presenter types used in the application MUST be added to this list!
-     */
     typedef touchgfx::meta::TypeList< homePresenter,
             touchgfx::meta::TypeList< lockPresenter,
             touchgfx::meta::TypeList< screen1Presenter,
-            touchgfx::meta::TypeList< Screen2Presenter,
-            touchgfx::meta::TypeList< Screen3Presenter,
+            touchgfx::meta::TypeList< walkPresenter,
+            touchgfx::meta::TypeList< runPresenter,
+            touchgfx::meta::TypeList< ropePresenter,
             touchgfx::meta::Nil >
-            >
-            >
-            >
-            > GeneratedPresenterTypes;
+            > > > > > GeneratedPresenterTypes;
 
-    /**
-     * Determine (compile time) the Presenter type of largest size.
-     */
     typedef touchgfx::meta::select_type_maxsize< GeneratedPresenterTypes >::type MaxGeneratedPresenterType;
 
-    /**
-     * A list of all transition types. Must end with meta::Nil.
-     * @note All transition types used in the application MUST be added to this list!
-     */
     typedef touchgfx::meta::TypeList< touchgfx::NoTransition,
             touchgfx::meta::Nil
             > GeneratedTransitionTypes;
 
-    /**
-     * Determine (compile time) the Transition type of largest size.
-     */
     typedef touchgfx::meta::select_type_maxsize< GeneratedTransitionTypes >::type MaxGeneratedTransitionType;
 
     virtual void gotoStartScreen(FrontendApplication& app)
     {
         app.gotohomeScreenNoTransition();
     }
+
 protected:
     FrontendHeapBase(touchgfx::AbstractPartition& presenters, touchgfx::AbstractPartition& views, touchgfx::AbstractPartition& transitions, FrontendApplication& app)
         : MVPHeap(presenters, views, transitions, app)
     {
-
     }
-
 };
 
 #endif // FRONTENDHEAPBASE_HPP

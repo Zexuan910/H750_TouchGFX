@@ -62,6 +62,8 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${APP_TARGET} PRIVATE
     Core/Src/lcd_port.c
+    Core/Src/max30102.c
+    Core/Src/max30102_service.c
 )
 
 if(ENABLE_CST816T_TOUCH)

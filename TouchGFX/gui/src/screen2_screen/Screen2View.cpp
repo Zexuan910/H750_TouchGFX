@@ -1,11 +1,20 @@
 #include <gui/screen2_screen/Screen2View.hpp>
 #include <gui/screen3_screen/Screen3View.hpp>
+#include <cstdio>
 #include <cstdlib>
 #include <images/BitmapDatabase.hpp>
 #include <touchgfx/Color.hpp>
 
 Screen2View::Screen2View()
-    : pressX(0), pressY(0), menuBuilt(false), detailBuilt(false), pageState(PageState::Nav), currentMode(SportMode::Walk)
+    : pressX(0),
+      pressY(0),
+      menuBuilt(false),
+      detailBuilt(false),
+      pageState(PageState::Nav),
+      currentMode(SportMode::Walk),
+      lastSnapshot(WatchUi::sampleSnapshot(0U)),
+      heartBuffer{0},
+      spo2Buffer{0}
 {
 
 }
@@ -57,6 +66,12 @@ void Screen2View::handleClickEvent(const touchgfx::ClickEvent& evt)
 void Screen2View::handleTickEvent()
 {
     Screen2ViewBase::handleTickEvent();
+}
+
+void Screen2View::updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot)
+{
+    lastSnapshot = snapshot;
+    applyWatchSnapshot();
 }
 
 void Screen2View::setupSportMenu()
@@ -246,6 +261,7 @@ void Screen2View::showDetail(SportMode mode)
     setNavVisible(false);
     setDetailVisible(true);
     applySportMode();
+    applyWatchSnapshot();
     invalidate();
 }
 
@@ -342,6 +358,37 @@ void Screen2View::applySportMode()
     topAccent.invalidate();
 }
 
+void Screen2View::applyWatchSnapshot()
+{
+    if (!detailBuilt)
+    {
+        return;
+    }
+
+    if (!lastSnapshot.sensorReady)
+    {
+        heartText.setText("SENSOR ERR");
+        statValueText[1].setText("ERR");
+    }
+    else if (!lastSnapshot.fingerDetected)
+    {
+        heartText.setText("PLACE FINGER");
+        statValueText[1].setText("--");
+    }
+    else if (!lastSnapshot.sensorValid)
+    {
+        heartText.setText("MEASURING");
+        statValueText[1].setText("--");
+    }
+    else
+    {
+        (void)std::snprintf(heartBuffer, sizeof(heartBuffer), "HR %u", lastSnapshot.heartRate);
+        (void)std::snprintf(spo2Buffer, sizeof(spo2Buffer), "%u%%", lastSnapshot.spo2Percent);
+        heartText.setText(heartBuffer);
+        statValueText[1].setText(spo2Buffer);
+    }
+}
+
 void Screen2View::advanceSportMode()
 {
     switch (currentMode)
@@ -361,6 +408,7 @@ void Screen2View::advanceSportMode()
     }
 
     applySportMode();
+    applyWatchSnapshot();
 }
 
 bool Screen2View::isInCard(int index, int x, int y) const

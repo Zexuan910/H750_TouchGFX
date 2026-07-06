@@ -36,7 +36,7 @@ void homeView::handleDragEvent(const touchgfx::DragEvent& event)
     }
     else if (lockHomeState.isLeftSwipe())
     {
-        application().gotoScreen2ScreenNoTransition();
+        application().gotoscreen1ScreenNoTransition();
     }
 }
 
@@ -52,7 +52,7 @@ void homeView::handleGestureEvent(const touchgfx::GestureEvent& event)
     else if (event.getType() == touchgfx::GestureEvent::SWIPE_HORIZONTAL &&
              lockHomeState.acceptsHorizontalSwipeGesture(event.getVelocity()))
     {
-        application().gotoScreen2ScreenNoTransition();
+        application().gotoscreen1ScreenNoTransition();
     }
 }
 

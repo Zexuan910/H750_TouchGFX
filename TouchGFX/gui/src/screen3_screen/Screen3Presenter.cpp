@@ -16,3 +16,8 @@ void Screen3Presenter::deactivate()
 {
 
 }
+
+void Screen3Presenter::watchDataUpdated(const WatchUi::WatchSnapshot& snapshot)
+{
+    view.updateWatchSnapshot(snapshot);
+}

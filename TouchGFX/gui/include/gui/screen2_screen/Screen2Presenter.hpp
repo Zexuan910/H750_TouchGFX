@@ -26,6 +26,7 @@ public:
     virtual void deactivate();
 
     virtual ~Screen2Presenter() {}
+    virtual void watchDataUpdated(const WatchUi::WatchSnapshot& snapshot);
 
 private:
     Screen2Presenter();

@@ -15,24 +15,28 @@ public:
 
     void gotolockScreenNoTransition();
     void gotoscreen1ScreenNoTransition();
-    void gotoScreen2ScreenNoTransition();
-    void gotoScreen3ScreenNoTransition();
+    void gotowalkScreenNoTransition();
+    void gotorunScreenNoTransition();
+    void gotoropeScreenNoTransition();
 
     virtual void handleTickEvent()
     {
         model.tick();
         FrontendApplicationBase::handleTickEvent();
     }
+
 private:
     touchgfx::Callback<FrontendApplication> lockTransitionCallback;
     touchgfx::Callback<FrontendApplication> screen1TransitionCallback;
-    touchgfx::Callback<FrontendApplication> screen2TransitionCallback;
-    touchgfx::Callback<FrontendApplication> screen3TransitionCallback;
+    touchgfx::Callback<FrontendApplication> walkTransitionCallback;
+    touchgfx::Callback<FrontendApplication> runTransitionCallback;
+    touchgfx::Callback<FrontendApplication> ropeTransitionCallback;
 
     void gotolockScreenNoTransitionImpl();
     void gotoscreen1ScreenNoTransitionImpl();
-    void gotoScreen2ScreenNoTransitionImpl();
-    void gotoScreen3ScreenNoTransitionImpl();
+    void gotowalkScreenNoTransitionImpl();
+    void gotorunScreenNoTransitionImpl();
+    void gotoropeScreenNoTransitionImpl();
 };
 
 #endif // FRONTENDAPPLICATION_HPP

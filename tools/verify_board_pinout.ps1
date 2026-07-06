@@ -109,6 +109,8 @@ $expectedIocSignals = [ordered]@{
     "PF9" = "QUADSPI_BK1_IO1"
     "PF7" = "QUADSPI_BK1_IO2"
     "PF6" = "QUADSPI_BK1_IO3"
+    "PB8" = "I2C1_SCL"
+    "PB9" = "I2C1_SDA"
 }
 
 foreach ($entry in $expectedIocSignals.GetEnumerator()) {
@@ -134,12 +136,24 @@ foreach ($pin in $expectedMainPins) {
 }
 
 $lcdPins = @("LCD_SDA", "LCD_SCK", "LCD_DC", "LCD_RST", "LCD_CS")
+$lcdPhysicalPins = @{}
 foreach ($name in $lcdPins) {
     $pinDefine = Get-DefineValue $mainLines "${name}_Pin"
     $portDefine = Get-DefineValue $mainLines "${name}_GPIO_Port"
     $physicalPin = Convert-ToPinName $portDefine $pinDefine
+    $lcdPhysicalPins[$physicalPin] = $name
     if ($qspiPhysicalPins.ContainsKey($physicalPin)) {
         throw "LCD pin $name conflicts with $($qspiPhysicalPins[$physicalPin]) on $physicalPin."
+    }
+}
+
+$max30102I2cPins = @("PB8", "PB9")
+foreach ($physicalPin in $max30102I2cPins) {
+    if ($qspiPhysicalPins.ContainsKey($physicalPin)) {
+        throw "MAX30102 I2C1 pin $physicalPin conflicts with $($qspiPhysicalPins[$physicalPin])."
+    }
+    if ($lcdPhysicalPins.ContainsKey($physicalPin)) {
+        throw "MAX30102 I2C1 pin $physicalPin conflicts with LCD pin $($lcdPhysicalPins[$physicalPin])."
     }
 }
 

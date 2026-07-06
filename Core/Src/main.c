@@ -19,6 +19,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ui.h"
+#include "max30102_service.h"
 
 /* USER CODE END Includes */
 
@@ -93,9 +94,12 @@ int main(void)
 #ifndef APP_EXECUTES_FROM_QSPI
   MX_QUADSPI_Init();
 #endif
+  MX_I2C1_Init();
   MX_I2C3_Init();
+  MX_I2C2_Init();
   UI_Init();
   /* USER CODE BEGIN 2 */
+  (void)Max30102Service_Init();
 
   /* USER CODE END 2 */
 
@@ -107,6 +111,7 @@ int main(void)
 
     UI_Process();
     /* USER CODE BEGIN 3 */
+    Max30102Service_Poll(HAL_GetTick());
   }
   /* USER CODE END 3 */
 }

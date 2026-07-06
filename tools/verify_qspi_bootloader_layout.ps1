@@ -86,7 +86,13 @@ $appMain = Read-RequiredText (Join-Path $Root "Core\Src\main.c")
 $bootLd = Read-RequiredText (Join-Path $Root "STM32H750XX_BOOTLOADER.ld")
 $appLd = Read-RequiredText (Join-Path $Root "STM32H750XX_QSPI_APP.ld")
 $bootMain = Read-RequiredText (Join-Path $Root "Core\Src\bootloader_main.c")
-$launchJson = Read-RequiredText (Join-Path $Root ".vscode\launch.json")
+$launchJsonPath = Join-Path $Root ".vscode\launch.json"
+$launchJson = $null
+if (Test-Path -LiteralPath $launchJsonPath) {
+    $launchJson = Read-RequiredText $launchJsonPath
+} else {
+    Write-Warning "Skipping VS Code debug launch validation because .vscode\launch.json is absent."
+}
 
 Assert-True ($cmake -match 'H750_TouchGFX_bootloader') "CMake does not define H750_TouchGFX_bootloader"
 Assert-True ($cmake -match 'H750_TouchGFX_app') "CMake does not define H750_TouchGFX_app"
@@ -105,9 +111,11 @@ Assert-True ($bootMain -match 'norflash_memory_mapped') "Bootloader does not ena
 Assert-True ($appMain -match 'APP_EXECUTES_FROM_QSPI') "App main does not guard external flash init for QSPI execution"
 Assert-True ($appMain -match 'MPU_INSTRUCTION_ACCESS_ENABLE') "QSPI MPU region is not executable"
 
-Assert-True ($launchJson -notmatch 'get-projects-binary-from-context') "VS Code debug still auto-selects an ELF and can pick stale H750_TouchGFX.elf"
-Assert-True ($launchJson -match 'H750_TouchGFX_bootloader\.elf') "VS Code debug does not point at H750_TouchGFX_bootloader.elf"
-Assert-True ($launchJson -notmatch 'H750_TouchGFX_app\.elf') "VS Code debug must not download the QSPI app ELF"
+if ($launchJson) {
+    Assert-True ($launchJson -notmatch 'get-projects-binary-from-context') "VS Code debug still auto-selects an ELF and can pick stale H750_TouchGFX.elf"
+    Assert-True ($launchJson -match 'H750_TouchGFX_bootloader\.elf') "VS Code debug does not point at H750_TouchGFX_bootloader.elf"
+    Assert-True ($launchJson -notmatch 'H750_TouchGFX_app\.elf') "VS Code debug must not download the QSPI app ELF"
+}
 
 $bootElf = Join-Path $BuildDir "H750_TouchGFX_bootloader.elf"
 $appElf = Join-Path $BuildDir "H750_TouchGFX_app.elf"

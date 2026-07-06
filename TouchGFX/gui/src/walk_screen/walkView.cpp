@@ -1,39 +1,42 @@
-#include <gui/screen3_screen/Screen3View.hpp>
+#include <gui/walk_screen/walkView.hpp>
 #include <cstdio>
 #include <images/BitmapDatabase.hpp>
 #include <touchgfx/Color.hpp>
 
-SportMode Screen3View::pendingSportMode = SportMode::Walk;
-
-Screen3View::Screen3View()
+walkView::walkView()
     : pressX(0),
       pressY(0),
-      currentMode(SportMode::Walk),
       detailBuilt(false),
       lastSnapshot(WatchUi::sampleSnapshot(0U)),
       heartBuffer{0},
-      spo2Buffer{0}
+      spo2Buffer{0},
+      rawRedBuffer{0},
+      rawIrBuffer{0},
+      fifoBuffer{0},
+      regBuffer{0},
+      ledBuffer{0},
+      addrBuffer{0},
+      failBuffer{0},
+      counterBuffer{0}
 {
-
 }
 
-void Screen3View::setupScreen()
+void walkView::setupScreen()
 {
-    Screen3ViewBase::setupScreen();
-    currentMode = pendingSportMode;
+    walkViewBase::setupScreen();
     setupSportDetail();
-    applySportMode();
+    applyStaticText();
     applyWatchSnapshot();
 }
 
-void Screen3View::tearDownScreen()
+void walkView::tearDownScreen()
 {
-    Screen3ViewBase::tearDownScreen();
+    walkViewBase::tearDownScreen();
 }
 
-void Screen3View::handleClickEvent(const touchgfx::ClickEvent& evt)
+void walkView::handleClickEvent(const touchgfx::ClickEvent& evt)
 {
-    Screen3ViewBase::handleClickEvent(evt);
+    walkViewBase::handleClickEvent(evt);
 
     if (evt.getType() == touchgfx::ClickEvent::PRESSED)
     {
@@ -42,57 +45,26 @@ void Screen3View::handleClickEvent(const touchgfx::ClickEvent& evt)
     }
     else if (evt.getType() == touchgfx::ClickEvent::RELEASED)
     {
-        int dx = evt.getX() - pressX;
-        int dy = evt.getY() - pressY;
+        const int dx = evt.getX() - pressX;
+        const int dy = evt.getY() - pressY;
         handleSwipe(dx, dy);
     }
 }
 
-void Screen3View::handleSwipe(int dx, int dy)
-{
-    const int SWIPE_THRESHOLD = 40;
-
-    if (dx > SWIPE_THRESHOLD)
-    {
-        application().gotoScreen2ScreenNoTransition();
-    }
-    else if (dx < -SWIPE_THRESHOLD)
-    {
-        advanceCarousel();
-    }
-}
-
-void Screen3View::handleTickEvent()
-{
-    Screen3ViewBase::handleTickEvent();
-}
-
-void Screen3View::updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot)
+void walkView::updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot)
 {
     lastSnapshot = snapshot;
     applyWatchSnapshot();
 }
 
-void Screen3View::setPendingSportMode(SportMode mode)
-{
-    pendingSportMode = mode;
-}
-
-void Screen3View::setupSportDetail()
+void walkView::setupSportDetail()
 {
     if (detailBuilt)
     {
-        circle1.setVisible(false);
-        circleText.setVisible(false);
-        image1.setVisible(false);
         return;
     }
 
-    circle1.setVisible(false);
-    circleText.setVisible(false);
-    image1.setVisible(false);
-
-    backgroundBox.setVisible(false);
+    __background.setVisible(false);
 
     backgroundImage.setXY(0, 0);
     backgroundImage.setBitmap(touchgfx::Bitmap(BITMAP_SPORT_BG_ID));
@@ -127,6 +99,8 @@ void Screen3View::setupSportDetail()
     mainLabelText.setColor(touchgfx::Color::getColorFromRGB(144, 160, 180));
     add(mainLabelText);
 
+    counterText.setVisible(false);
+
     const int boxX[5] = { 12, 124, 12, 85, 158 };
     const int boxY[5] = { 110, 110, 186, 186, 186 };
     const int boxW[5] = { 104, 104, 62, 70, 70 };
@@ -160,70 +134,24 @@ void Screen3View::setupSportDetail()
     detailBuilt = true;
 }
 
-void Screen3View::applySportMode()
+void walkView::applyStaticText()
 {
-    struct SportDetail
-    {
-        const char* title;
-        const char* heart;
-        const char* mainValue;
-        const char* mainLabel;
-        const char* value[5];
-        const char* label[5];
-        uint8_t accentR;
-        uint8_t accentG;
-        uint8_t accentB;
-    };
+    titleText.setText("WALK");
+    heartText.setText("HR 82");
+    mainValueText.setText("1.26");
+    mainLabelText.setText("KM");
 
-    const SportDetail details[3] = {
-        {
-            "WALK",
-            "HR 82",
-            "1.26",
-            "KM",
-            { "00:18", "98%", "1.2", "1.0", "62" },
-            { "TIME", "SPO2", "NOW", "AVG", "STEP" },
-            63, 212, 122
-        },
-        {
-            "RUN",
-            "HR 146",
-            "4.32",
-            "KM",
-            { "00:26", "97%", "3.6", "2.9", "84" },
-            { "TIME", "SPO2", "NOW", "AVG", "CAD" },
-            255, 106, 61
-        },
-        {
-            "ROPE",
-            "HR 132",
-            "860",
-            "COUNT",
-            { "00:12", "98%", "72", "68", "95" },
-            { "TIME", "SPO2", "NOW", "AVG", "KCAL" },
-            108, 140, 255
-        }
-    };
-
-    const int index = static_cast<int>(currentMode);
-    const SportDetail& detail = details[index];
-
-    topAccent.setColor(touchgfx::Color::getColorFromRGB(detail.accentR, detail.accentG, detail.accentB));
-    titleText.setText(detail.title);
-    heartText.setText(detail.heart);
-    mainValueText.setText(detail.mainValue);
-    mainLabelText.setText(detail.mainLabel);
+    const char* value[5] = { "00:18", "98%", "1.2", "1.0", "62" };
+    const char* label[5] = { "TIME", "SPO2", "NOW", "AVG", "STEP" };
 
     for (int i = 0; i < 5; i++)
     {
-        statValueText[i].setText(detail.value[i]);
-        statLabelText[i].setText(detail.label[i]);
+        statValueText[i].setText(value[i]);
+        statLabelText[i].setText(label[i]);
     }
-
-    topAccent.invalidate();
 }
 
-void Screen3View::applyWatchSnapshot()
+void walkView::applyWatchSnapshot()
 {
     if (!detailBuilt)
     {
@@ -254,30 +182,12 @@ void Screen3View::applyWatchSnapshot()
     }
 }
 
-void Screen3View::advanceCarousel()
+void walkView::handleSwipe(int dx, int dy)
 {
-    switch (currentMode)
+    const int SWIPE_THRESHOLD = 40;
+
+    if (dx > SWIPE_THRESHOLD && dy < SWIPE_THRESHOLD && dy > -SWIPE_THRESHOLD)
     {
-    case SportMode::Walk:
-        currentMode = SportMode::Run;
-        setPendingSportMode(currentMode);
-        applySportMode();
-        applyWatchSnapshot();
-        break;
-
-    case SportMode::Run:
-        currentMode = SportMode::Rope;
-        setPendingSportMode(currentMode);
-        applySportMode();
-        applyWatchSnapshot();
-        break;
-
-    case SportMode::Rope:
-    default:
-        currentMode = SportMode::Walk;
-        setPendingSportMode(currentMode);
-        applySportMode();
-        applyWatchSnapshot();
-        break;
+        application().gotoscreen1ScreenNoTransition();
     }
 }

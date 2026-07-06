@@ -26,12 +26,14 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/lock_screen/lockPresenter.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/lock_screen/lockView.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/model/Model.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/rope_screen/ropePresenter.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/rope_screen/ropeView.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/run_screen/runPresenter.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/run_screen/runView.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen1_screen/screen1Presenter.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen1_screen/screen1View.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen2_screen/Screen2Presenter.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen2_screen/Screen2View.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen3_screen/Screen3Presenter.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/screen3_screen/Screen3View.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/walk_screen/walkPresenter.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/gui/src/walk_screen/walkView.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/ApplicationFontProvider.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CachedFont.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/fonts/src/CompressedFontCache.cpp
@@ -52,9 +54,10 @@ set(TouchGFX_Src
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/common/FrontendApplicationBase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/home_screen/homeViewBase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/lock_screen/lockViewBase.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/rope_screen/ropeViewBase.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/run_screen/runViewBase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/screen1_screen/screen1ViewBase.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/screen2_screen/Screen2ViewBase.cpp
-    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/screen3_screen/Screen3ViewBase.cpp
+    ${CMAKE_SOURCE_DIR}/TouchGFX/generated/gui_generated/src/walk_screen/walkViewBase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/BitmapDatabase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/SVGDatabase.cpp
     ${CMAKE_SOURCE_DIR}/TouchGFX/generated/images/src/__generated/image_alternate_theme_images_widgets_button_regular_height_36_tiny_rounded_action.cpp

@@ -57,9 +57,6 @@ void screen1ViewBase::buttonCallbackHandler(const touchgfx::AbstractButton& src)
 {
     if (&src == &nextButton)
     {
-        //Interaction1
-        //When nextButton clicked change screen to Screen2
-        //Go to Screen2 with no screen transition
-        application().gotoScreen2ScreenNoTransition();
+        application().gotowalkScreenNoTransition();
     }
 }

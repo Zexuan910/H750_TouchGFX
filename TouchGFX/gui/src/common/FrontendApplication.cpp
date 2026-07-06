@@ -1,13 +1,15 @@
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/common/FrontendHeap.hpp>
-#include <gui/lock_screen/lockView.hpp>
 #include <gui/lock_screen/lockPresenter.hpp>
-#include <gui/screen1_screen/screen1View.hpp>
+#include <gui/lock_screen/lockView.hpp>
+#include <gui/rope_screen/ropePresenter.hpp>
+#include <gui/rope_screen/ropeView.hpp>
+#include <gui/run_screen/runPresenter.hpp>
+#include <gui/run_screen/runView.hpp>
 #include <gui/screen1_screen/screen1Presenter.hpp>
-#include <gui/screen2_screen/Screen2View.hpp>
-#include <gui/screen2_screen/Screen2Presenter.hpp>
-#include <gui/screen3_screen/Screen3View.hpp>
-#include <gui/screen3_screen/Screen3Presenter.hpp>
+#include <gui/screen1_screen/screen1View.hpp>
+#include <gui/walk_screen/walkPresenter.hpp>
+#include <gui/walk_screen/walkView.hpp>
 #include <touchgfx/transitions/NoTransition.hpp>
 
 using namespace touchgfx;
@@ -16,10 +18,10 @@ FrontendApplication::FrontendApplication(Model& m, FrontendHeap& heap)
     : FrontendApplicationBase(m, heap),
       lockTransitionCallback(),
       screen1TransitionCallback(),
-      screen2TransitionCallback(),
-      screen3TransitionCallback()
+      walkTransitionCallback(),
+      runTransitionCallback(),
+      ropeTransitionCallback()
 {
-
 }
 
 void FrontendApplication::gotolockScreenNoTransition()
@@ -44,24 +46,35 @@ void FrontendApplication::gotoscreen1ScreenNoTransitionImpl()
     touchgfx::makeTransition<screen1View, screen1Presenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }
 
-void FrontendApplication::gotoScreen2ScreenNoTransition()
+void FrontendApplication::gotowalkScreenNoTransition()
 {
-    screen2TransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotoScreen2ScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &screen2TransitionCallback;
+    walkTransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotowalkScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &walkTransitionCallback;
 }
 
-void FrontendApplication::gotoScreen2ScreenNoTransitionImpl()
+void FrontendApplication::gotowalkScreenNoTransitionImpl()
 {
-    touchgfx::makeTransition<Screen2View, Screen2Presenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+    touchgfx::makeTransition<walkView, walkPresenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }
 
-void FrontendApplication::gotoScreen3ScreenNoTransition()
+void FrontendApplication::gotorunScreenNoTransition()
 {
-    screen3TransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotoScreen3ScreenNoTransitionImpl);
-    pendingScreenTransitionCallback = &screen3TransitionCallback;
+    runTransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotorunScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &runTransitionCallback;
 }
 
-void FrontendApplication::gotoScreen3ScreenNoTransitionImpl()
+void FrontendApplication::gotorunScreenNoTransitionImpl()
 {
-    touchgfx::makeTransition<Screen3View, Screen3Presenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+    touchgfx::makeTransition<runView, runPresenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
+}
+
+void FrontendApplication::gotoropeScreenNoTransition()
+{
+    ropeTransitionCallback = touchgfx::Callback<FrontendApplication>(this, &FrontendApplication::gotoropeScreenNoTransitionImpl);
+    pendingScreenTransitionCallback = &ropeTransitionCallback;
+}
+
+void FrontendApplication::gotoropeScreenNoTransitionImpl()
+{
+    touchgfx::makeTransition<ropeView, ropePresenter, touchgfx::NoTransition, Model>(&currentScreen, &currentPresenter, frontendHeap, &currentTransition, &model);
 }

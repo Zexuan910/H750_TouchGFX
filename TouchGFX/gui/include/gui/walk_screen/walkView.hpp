@@ -1,33 +1,27 @@
-#ifndef SCREEN3VIEW_HPP
-#define SCREEN3VIEW_HPP
+#ifndef WALKVIEW_HPP
+#define WALKVIEW_HPP
 
-#include <gui_generated/screen3_screen/Screen3ViewBase.hpp>
-#include <gui/screen3_screen/Screen3Presenter.hpp>
 #include <gui/common/PixelText.hpp>
-#include <gui/common/SportMode.hpp>
 #include <gui/watch/WatchUiData.hpp>
+#include <gui_generated/walk_screen/walkViewBase.hpp>
 #include <touchgfx/events/ClickEvent.hpp>
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/Image.hpp>
 
-class Screen3View : public Screen3ViewBase
+class walkView : public walkViewBase
 {
 public:
-    Screen3View();
-    virtual ~Screen3View() {}
+    walkView();
+    virtual ~walkView() {}
+
     virtual void setupScreen();
     virtual void tearDownScreen();
     virtual void handleClickEvent(const touchgfx::ClickEvent& evt);
-    virtual void handleTickEvent();
     void updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot);
-    static void setPendingSportMode(SportMode mode);
 
 protected:
-    static SportMode pendingSportMode;
-
     int pressX;
     int pressY;
-    SportMode currentMode;
     bool detailBuilt;
 
     touchgfx::Image backgroundImage;
@@ -38,17 +32,25 @@ protected:
     PixelText heartText;
     PixelText mainValueText;
     PixelText mainLabelText;
+    PixelText counterText;
     PixelText statValueText[5];
     PixelText statLabelText[5];
     WatchUi::WatchSnapshot lastSnapshot;
     char heartBuffer[16];
     char spo2Buffer[8];
+    char rawRedBuffer[12];
+    char rawIrBuffer[12];
+    char fifoBuffer[16];
+    char regBuffer[12];
+    char ledBuffer[12];
+    char addrBuffer[24];
+    char failBuffer[16];
+    char counterBuffer[40];
 
     void setupSportDetail();
-    void applySportMode();
+    void applyStaticText();
     void applyWatchSnapshot();
-    void advanceCarousel();
     void handleSwipe(int dx, int dy);
 };
 
-#endif // SCREEN3VIEW_HPP
+#endif // WALKVIEW_HPP

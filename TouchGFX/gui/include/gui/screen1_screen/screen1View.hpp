@@ -3,7 +3,10 @@
 
 #include <gui_generated/screen1_screen/screen1ViewBase.hpp>
 #include <gui/screen1_screen/screen1Presenter.hpp>
+#include <gui/common/PixelText.hpp>
 #include <touchgfx/events/ClickEvent.hpp>
+#include <touchgfx/widgets/Box.hpp>
+#include <touchgfx/widgets/Image.hpp>
 
 class screen1View : public screen1ViewBase
 {
@@ -15,13 +18,23 @@ public:
     virtual void handleClickEvent(const touchgfx::ClickEvent& evt);
 
 protected:
-    int demoState;
     int pressX;
     int pressY;
+    bool navigationBuilt;
 
-    bool isInTouchBox(int x, int y) const;
-    void nextDemoState();
-    void updateDisplay();
+    touchgfx::Image backgroundImage;
+    touchgfx::Box dimOverlay;
+    touchgfx::Box topAccent;
+    touchgfx::Box cardBox[3];
+    PixelText titleText;
+    PixelText hintText;
+    PixelText cardTitleText[3];
+    PixelText cardHintText[3];
+
+    bool isInCard(int index, int x, int y) const;
+    void setupNavigation();
+    void updateNavigation();
+    void openCard(int index);
     void handleSwipe(int dx, int dy);
 };
 

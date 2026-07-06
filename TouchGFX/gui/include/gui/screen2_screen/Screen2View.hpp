@@ -5,6 +5,7 @@
 #include <gui/screen2_screen/Screen2Presenter.hpp>
 #include <gui/common/PixelText.hpp>
 #include <gui/common/SportMode.hpp>
+#include <gui/watch/WatchUiData.hpp>
 #include <touchgfx/events/ClickEvent.hpp>
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/Image.hpp>
@@ -18,6 +19,7 @@ public:
     virtual void tearDownScreen();
     virtual void handleClickEvent(const touchgfx::ClickEvent& evt);
     virtual void handleTickEvent();
+    void updateWatchSnapshot(const WatchUi::WatchSnapshot& snapshot);
 
 protected:
     enum class PageState
@@ -50,6 +52,9 @@ protected:
     PixelText mainLabelText;
     PixelText statValueText[5];
     PixelText statLabelText[5];
+    WatchUi::WatchSnapshot lastSnapshot;
+    char heartBuffer[16];
+    char spo2Buffer[8];
 
     void setupSportMenu();
     void setupSportDetail();
@@ -60,6 +65,7 @@ protected:
     void setNavVisible(bool visible);
     void setDetailVisible(bool visible);
     void applySportMode();
+    void applyWatchSnapshot();
     void advanceSportMode();
     bool isInCard(int index, int x, int y) const;
     void handleSwipe(int dx, int dy);

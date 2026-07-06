@@ -16,3 +16,8 @@ void Screen2Presenter::deactivate()
 {
 
 }
+
+void Screen2Presenter::watchDataUpdated(const WatchUi::WatchSnapshot& snapshot)
+{
+    view.updateWatchSnapshot(snapshot);
+}

@@ -88,21 +88,6 @@
       <Text Id="HOME_WEEKDAY" Alignment="Left" TypographyId="Default">
         <Translation Language="GB">FRIDAY</Translation>
       </Text>
-      <Text Id="__SingleUse_IOQU" Alignment="Left" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
-      </Text>
-      <Text Id="__SingleUse_GH4U" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
-      </Text>
-      <Text Id="__SingleUse_YBPW" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
-      </Text>
-      <Text Id="__SingleUse_S7VM" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">New Text</Translation>
-      </Text>
-      <Text Id="__SingleUse_06WV" Alignment="Center" TypographyId="Default">
-        <Translation Language="GB">下一页</Translation>
-      </Text>
       <Text Id="T_TITLE" Alignment="Center" TypographyId="Default">
         <Translation Language="GB">Hello TouchGFX</Translation>
       </Text>

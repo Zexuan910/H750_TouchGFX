@@ -1,10 +1,9 @@
 #include <gui/screen1_screen/screen1View.hpp>
-#include <touchgfx/Color.hpp>
-#include <texts/TextKeysAndLanguages.hpp>
 #include <images/BitmapDatabase.hpp>
+#include <touchgfx/Color.hpp>
 
 screen1View::screen1View()
-    : demoState(0), pressX(0), pressY(0)
+    : pressX(0), pressY(0), navigationBuilt(false)
 {
 
 }
@@ -12,8 +11,8 @@ screen1View::screen1View()
 void screen1View::setupScreen()
 {
     screen1ViewBase::setupScreen();
-    demoState = 0;
-    updateDisplay();
+    setupNavigation();
+    updateNavigation();
 }
 
 void screen1View::tearDownScreen()
@@ -21,9 +20,15 @@ void screen1View::tearDownScreen()
     screen1ViewBase::tearDownScreen();
 }
 
-bool screen1View::isInTouchBox(int x, int y) const
+bool screen1View::isInCard(int index, int x, int y) const
 {
-    return (x >= 30 && x <= 210 && y >= 25 && y <= 85);
+    const int cardY[3] = { 70, 128, 186 };
+    return index >= 0 &&
+           index < 3 &&
+           x >= 18 &&
+           x <= 222 &&
+           y >= cardY[index] &&
+           y <= (cardY[index] + 44);
 }
 
 void screen1View::handleClickEvent(const touchgfx::ClickEvent& evt)
@@ -41,9 +46,16 @@ void screen1View::handleClickEvent(const touchgfx::ClickEvent& evt)
         const int dy = evt.getY() - pressY;
         handleSwipe(dx, dy);
 
-        if (dx < 20 && dx > -20 && dy < 20 && dy > -20 && isInTouchBox(evt.getX(), evt.getY()))
+        if (dx < 20 && dx > -20 && dy < 20 && dy > -20)
         {
-            nextDemoState();
+            for (int i = 0; i < 3; i++)
+            {
+                if (isInCard(i, evt.getX(), evt.getY()))
+                {
+                    openCard(i);
+                    break;
+                }
+            }
         }
     }
 }
@@ -54,92 +66,107 @@ void screen1View::handleSwipe(int dx, int dy)
 
     if (dx > SWIPE_THRESHOLD && (dy < SWIPE_THRESHOLD && dy > -SWIPE_THRESHOLD))
     {
-        application().gotoScreen2ScreenNoTransition();
+        application().gotohomeScreenNoTransition();
     }
 }
 
-void screen1View::nextDemoState()
+void screen1View::setupNavigation()
 {
-    demoState++;
-    if (demoState >= 11)
+    if (navigationBuilt)
     {
-        demoState = 0;
+        return;
     }
 
-    updateDisplay();
+    touchBox.setVisible(false);
+    touchText.setVisible(false);
+    displayBox.setVisible(false);
+    displayText.setVisible(false);
+    displayImage.setVisible(false);
+    nextButton.setVisible(false);
+    nextButton.setTouchable(false);
+
+    backgroundImage.setXY(0, 0);
+    backgroundImage.setBitmap(touchgfx::Bitmap(BITMAP_WATCH_BG_ID));
+    add(backgroundImage);
+
+    dimOverlay.setPosition(0, 0, 240, 280);
+    dimOverlay.setColor(touchgfx::Color::getColorFromRGB(8, 18, 28));
+    dimOverlay.setAlpha(132);
+    add(dimOverlay);
+
+    topAccent.setPosition(0, 0, 240, 5);
+    topAccent.setColor(touchgfx::Color::getColorFromRGB(63, 212, 122));
+    add(topAccent);
+
+    titleText.setScale(2);
+    titleText.setPosition(18, 18, 0, 0);
+    titleText.setColor(touchgfx::Color::getColorFromRGB(245, 248, 255));
+    add(titleText);
+
+    hintText.setScale(1);
+    hintText.setPosition(18, 44, 0, 0);
+    hintText.setColor(touchgfx::Color::getColorFromRGB(151, 169, 190));
+    add(hintText);
+
+    const int cardY[3] = { 70, 128, 186 };
+    const uint8_t cardColor[3][3] = {
+        { 24, 78, 66 },
+        { 106, 51, 38 },
+        { 48, 58, 125 }
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        cardBox[i].setPosition(18, cardY[i], 204, 44);
+        cardBox[i].setColor(touchgfx::Color::getColorFromRGB(cardColor[i][0], cardColor[i][1], cardColor[i][2]));
+        cardBox[i].setAlpha(226);
+        add(cardBox[i]);
+
+        cardTitleText[i].setScale(2);
+        cardTitleText[i].setPosition(30, cardY[i] + 8, 0, 0);
+        cardTitleText[i].setColor(touchgfx::Color::getColorFromRGB(245, 248, 255));
+        add(cardTitleText[i]);
+
+        cardHintText[i].setScale(1);
+        cardHintText[i].setPosition(142, cardY[i] + 18, 0, 0);
+        cardHintText[i].setColor(touchgfx::Color::getColorFromRGB(190, 206, 222));
+        add(cardHintText[i]);
+    }
+
+    navigationBuilt = true;
 }
 
-void screen1View::updateDisplay()
+void screen1View::updateNavigation()
 {
-    displayText.setVisible(true);
-    displayImage.setVisible(false);
+    titleText.setText("SPORT");
+    hintText.setText("TAP MODE");
 
-    switch (demoState)
+    cardTitleText[0].setText("WALK");
+    cardTitleText[1].setText("RUN");
+    cardTitleText[2].setText("ROPE");
+
+    cardHintText[0].setText("START");
+    cardHintText[1].setText("START");
+    cardHintText[2].setText("START");
+}
+
+void screen1View::openCard(int index)
+{
+    switch (index)
     {
     case 0:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(255, 0, 0));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_WORD));
+        application().gotowalkScreenNoTransition();
         break;
 
     case 1:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(0, 255, 0));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_WORD));
+        application().gotorunScreenNoTransition();
         break;
 
     case 2:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(0, 0, 255));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_WORD));
-        break;
-
-    case 3:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(32, 32, 32));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_WORD));
-        break;
-
-    case 4:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(32, 32, 32));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_BUAA));
-        break;
-
-    case 5:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(32, 32, 32));
-        displayText.setTypedText(touchgfx::TypedText(T_T_HELLO_UBAA));
-        break;
-
-    case 6:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(20, 80, 120));
-        displayText.setTypedText(touchgfx::TypedText(T_T_CN_1));
-        break;
-
-    case 7:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(20, 80, 120));
-        displayText.setTypedText(touchgfx::TypedText(T_T_CN_2));
-        break;
-
-    case 8:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(20, 80, 120));
-        displayText.setTypedText(touchgfx::TypedText(T_T_CN_3));
-        break;
-
-    case 9:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
-        displayText.setVisible(false);
-        displayImage.setVisible(true);
-        displayImage.setBitmap(touchgfx::Bitmap(BITMAP_A_ID));
-        break;
-
-    case 10:
-        displayBox.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
-        displayText.setVisible(false);
-        displayImage.setVisible(true);
-        displayImage.setBitmap(touchgfx::Bitmap(BITMAP_B_ID));
+        application().gotoropeScreenNoTransition();
         break;
 
     default:
         break;
     }
-
-    displayBox.invalidate();
-    displayText.invalidate();
-    displayImage.invalidate();
 }
