@@ -19,6 +19,10 @@
 #define IMU_WIRELESS_TX_PERIOD_MS 50U
 #define IMU_WIRELESS_TX_TIMEOUT_MS 20U
 #define IMU_ENABLE_WIRELESS_TX  0U
+/* Keep the H750 side on USART1 wireless IMU input only. The wzx I2C fallback
+ * used PB8/PB9 through I2C4, but this ljl merge keeps PB8/PB9 on I2C1 for
+ * MAX30102 heart-rate/SpO2, so enabling the fallback would create a pin clash.
+ */
 #define IMU_ENABLE_I2C_FALLBACK 0U
 
 static uint8_t imu_sensor_ready;
